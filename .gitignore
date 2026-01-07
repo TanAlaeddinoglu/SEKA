@@ -1,0 +1,54 @@
+################################
+# BACKEND (Spring Boot)
+################################
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/HELP.md
+
+# Spring env & secrets
+backend/.env
+backend/.env.local
+backend/.env.example
+backend/credentials.json
+backend/private_key.pem
+backend/public_key.pem
+
+# MinIO data (LOCAL ONLY)
+backend/minio-data/
+
+################################
+# FRONTEND (Vite / React)
+################################
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+################################
+# IDE & OS
+################################
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+.DS_Store
+Thumbs.db
+
+################################
+# Java build leftovers (GENERIC)
+################################
+**/build/
+**/target/
+
+################################
+# Spring / STS
+################################
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache

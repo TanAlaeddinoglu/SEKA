@@ -1,0 +1,46 @@
+package com.ambalajwebsite.ambalajwebsite.controller;
+
+import com.ambalajwebsite.ambalajwebsite.dto.FeatureDto;
+import com.ambalajwebsite.ambalajwebsite.dto.ProductDto;
+import com.ambalajwebsite.ambalajwebsite.service.ProductFeatureService;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/v1/product-feature/")
+public class ProductFeatureController {
+    private final ProductFeatureService productFeatureService;
+
+    public ProductFeatureController(ProductFeatureService productFeatureService) {
+        this.productFeatureService = productFeatureService;
+    }
+
+    @PostMapping
+    public ResponseEntity<FeatureDto> createProductFeature(@RequestBody FeatureDto featureDto) {
+        return ResponseEntity.ok(productFeatureService.createProductFeature(featureDto));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<FeatureDto>> getAllProductFeatures() {
+        return ResponseEntity.ok(productFeatureService.getAllProductsFeatures());
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<FeatureDto> getFeatureDtoById(@PathVariable Long id) {
+        return ResponseEntity.ok(productFeatureService.getFeatureDtoById(id));
+    }
+
+    @PatchMapping({"{id}"})
+    public ResponseEntity<FeatureDto> PartialUpdateProductFeature (@PathVariable Long id, @RequestBody FeatureDto featureDto) {
+        return ResponseEntity.ok(productFeatureService.updateFeature(featureDto, id));
+    }
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteProductFeature(@PathVariable Long id)  {
+//        productFeatureService.deleteProduct(id);
+//        return ResponseEntity.ok().build();
+//    }
+}

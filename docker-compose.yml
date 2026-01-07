@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    container_name: ambalaj-db
+    environment:
+      POSTGRES_DB: ambalaj_db
+      POSTGRES_USER: crm_user
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2024-03-07T00-43-48Z
+    container_name: ambalaj-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: qWuAfozeQourCLTlXe1C
+      MINIO_ROOT_PASSWORD: YNIk8DfItbGOvO3AHAVv6XSTyGhV0OSA2hu31hdW
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./minio-data:/data
