@@ -45,7 +45,7 @@ class CategoryServiceTest {
         saved.setSlug("koli-kutular");
 
         when(categoryRepository.save(org.mockito.ArgumentMatchers.any(Category.class))).thenReturn(saved);
-        when(categoryDtoConverter.convert(saved)).thenReturn(new CategoryDto(1L, "Koli Kutular", "koli-kutular", List.of()));
+        when(categoryDtoConverter.convert(saved)).thenReturn(new CategoryDto(1L, "Koli Kutular", "koli-kutular", List.of(), true));
 
         CategoryDto result = categoryService.createCategory(request);
 
@@ -64,7 +64,7 @@ class CategoryServiceTest {
         category.setSlug("koli");
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-        when(categoryDtoConverter.convert(category)).thenReturn(new CategoryDto(1L, "Koli", "koli", List.of()));
+        when(categoryDtoConverter.convert(category)).thenReturn(new CategoryDto(1L, "Koli", "koli", List.of(), true));
 
         CategoryDto result = categoryService.getCategoryDtoById(1L);
         assertEquals("koli", result.getSlug());
@@ -79,9 +79,9 @@ class CategoryServiceTest {
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         when(categoryRepository.existsBySlugAndIdNot("yeni", 1L)).thenReturn(false);
-        when(categoryDtoConverter.convert(category)).thenReturn(new CategoryDto(1L, "Yeni", "yeni", List.of()));
+        when(categoryDtoConverter.convert(category)).thenReturn(new CategoryDto(1L, "Yeni", "yeni", List.of(),true));
 
-        CategoryDto request = new CategoryDto(null, "Yeni", null, null);
+        CategoryDto request = new CategoryDto(null, "Yeni", null, null,true);
         CategoryDto result = categoryService.updateCategory(request, 1L);
 
         assertEquals("Yeni", category.getCategoryName());

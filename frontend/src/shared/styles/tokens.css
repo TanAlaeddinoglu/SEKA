@@ -1,0 +1,22 @@
+:root {
+    /* Colors */
+    --color-bg: #f8f9fb;
+    --color-white: #ffffff;
+    --color-dark: #111827;
+    --color-dark-2: #1f2937;
+    --color-border: #e5e7eb;
+    --color-primary: #2563eb;
+
+    /* Typography */
+    --font-main: system-ui, -apple-system, BlinkMacSystemFont;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+
+    /* Layout */
+    --sidebar-width: 240px;
+    --topbar-height: 56px;
+}

@@ -1,0 +1,41 @@
+/* ===== Mobile First ===== */
+
+.product-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.control-item label {
+    font-size: 13px;
+    color: #475569;
+}
+
+.control-item select {
+    padding: 10px;
+    font-size: 16px; /* iOS zoom önleme */
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: white;
+}
+
+/* ===== Desktop ===== */
+
+@media (min-width: 768px) {
+    .product-controls {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 24px;
+    }
+
+    .control-item {
+        width: 200px;
+    }
+}

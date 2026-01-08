@@ -1,0 +1,41 @@
+.admin-topbar {
+    height: var(--topbar-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-white);
+}
+
+.admin-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.admin-topbar-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.admin-topbar-right button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Desktop: hamburger gizle */
+@media (min-width: 768px) {
+    .menu-btn {
+        display: none;
+    }
+}
