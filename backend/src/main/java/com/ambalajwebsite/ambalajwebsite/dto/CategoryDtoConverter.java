@@ -27,6 +27,7 @@ public class CategoryDtoConverter {
         dto.setId(category.getId());
         dto.setCategoryName(category.getCategoryName());
         dto.setSlug(category.getSlug());
+        dto.setActive(category.isActive());
         dto.setProducts(category.getProducts()
                 .stream()
                 .map(productDtoConverter::convert)

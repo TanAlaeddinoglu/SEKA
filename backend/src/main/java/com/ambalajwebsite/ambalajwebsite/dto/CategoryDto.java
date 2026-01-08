@@ -17,4 +17,5 @@ public class CategoryDto {
     private String categoryName;
     private String slug;
     private List<ProductDto> products;
+    private boolean isActive;
 }

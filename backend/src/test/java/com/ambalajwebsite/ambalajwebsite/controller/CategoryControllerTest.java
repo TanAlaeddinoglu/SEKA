@@ -44,7 +44,7 @@ class CategoryControllerTest {
     @Test
     void createCategory_returnsDto() throws Exception {
         CreateCategoryDto request = new CreateCategoryDto("Koli");
-        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of());
+        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of(),true);
 
         when(categoryService.createCategory(any())).thenReturn(response);
 
@@ -59,7 +59,7 @@ class CategoryControllerTest {
 
     @Test
     void getAllCategories_returnsList() throws Exception {
-        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of());
+        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of(), true);
         when(categoryService.getAllCategory()).thenReturn(List.of(response));
 
         mockMvc.perform(get("/v1/category/"))
@@ -70,7 +70,7 @@ class CategoryControllerTest {
 
     @Test
     void getCategoryById_returnsDto() throws Exception {
-        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of());
+        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of(),true);
         when(categoryService.getCategoryDtoById(1L)).thenReturn(response);
 
         mockMvc.perform(get("/v1/category/1"))
@@ -81,8 +81,8 @@ class CategoryControllerTest {
 
     @Test
     void partialUpdateCategory_returnsDto() throws Exception {
-        CategoryDto request = new CategoryDto(null, "Yeni", null, null);
-        CategoryDto response = new CategoryDto(1L, "Yeni", "yeni", List.of());
+        CategoryDto request = new CategoryDto(null, "Yeni", null, null,true);
+        CategoryDto response = new CategoryDto(1L, "Yeni", "yeni", List.of(),true);
 
         when(categoryService.updateCategory(any(), org.mockito.ArgumentMatchers.eq(1L))).thenReturn(response);
 

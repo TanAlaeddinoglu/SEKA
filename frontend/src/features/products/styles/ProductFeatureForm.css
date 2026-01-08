@@ -1,0 +1,82 @@
+.product-feature-form {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    width: 100%;           /* 📱 mobil tam genişlik */
+    box-sizing: border-box;
+}
+
+/* Başlık */
+.product-feature-form h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Inputlar */
+.product-feature-form input {
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    width: 100%;
+
+    box-sizing: border-box;
+}
+.product-feature-form select {
+    padding: 14px;
+    font-size: 16px; /* iOS zoom fix */
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    width: 100%;
+    background: white;
+}
+
+
+/* Number inputlar için küçük iyileştirme */
+.product-feature-form input[type="number"] {
+    appearance: textfield;
+}
+
+/* Kaydet butonu */
+.product-feature-form button {
+    padding: 14px;
+    border-radius: 6px;
+    border: none;
+    background: var(--color-primary);
+    color: white;
+
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+
+    width: 100%; /* 📱 mobilde tam genişlik */
+}
+
+/* Disabled durumu */
+.product-feature-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================
+   TABLET & DESKTOP
+   ========================= */
+@media (min-width: 768px) {
+    .product-feature-form {
+        max-width: 520px;
+        padding: 20px;
+    }
+
+    .product-feature-form button {
+        width: fit-content;  /* 💻 desktop’ta içerik kadar */
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+}
