@@ -19,8 +19,6 @@ httpClient.interceptors.response.use(
     (error) => {
         console.log("🔥 INTERCEPTOR ERROR:", error.response?.data);
         const message = parseApiError(error);
-        toast.error("TEST TOAST");
-
         toast.error(message);
         return Promise.reject(error);
     }
