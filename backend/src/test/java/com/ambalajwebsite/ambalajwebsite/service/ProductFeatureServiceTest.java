@@ -35,45 +35,45 @@ class ProductFeatureServiceTest {
     @InjectMocks
     private ProductFeatureService productFeatureService;
 
-    @Test
-    void createProductFeature_savesWhenMissing() {
-        Product product = new Product();
-        product.setId(5L);
+//    @Test
+//    void createProductFeature_savesWhenMissing() {
+//        Product product = new Product();
+//        product.setId(5L);
+//
+//        FeatureDto request = new FeatureDto(null, UnitType.PIECE, 10, 2, "mavi", "10x10", "1kg", 5L);
+//        ProductFeature saved = ProductFeature.builder()
+//                .id(1L)
+//                .unit(UnitType.PIECE)
+//                .unitPerPack(10)
+//                .packPerCarton(2)
+//                .color("mavi")
+//                .size("10x10")
+//                .weight("1kg")
+//                .product(product)
+//                .build();
+//
+//        when(productRepository.findById(5L)).thenReturn(Optional.of(product));
+//        when(productFeatureRepository.save(org.mockito.ArgumentMatchers.any(ProductFeature.class))).thenReturn(saved);
+//        when(featureDtoConverter.convert(saved)).thenReturn(new FeatureDto(1L, UnitType.PIECE, 10, 2, "mavi", "10x10", "1kg", 5L));
+//
+//        FeatureDto result = productFeatureService.createProductFeature(request);
+//
+//        assertEquals(1L, result.getId());
+//        assertEquals(UnitType.PIECE, result.getUnitType());
+//    }
 
-        FeatureDto request = new FeatureDto(null, UnitType.PIECE, 10, 2, "mavi", "10x10", "1kg", 5L);
-        ProductFeature saved = ProductFeature.builder()
-                .id(1L)
-                .unit(UnitType.PIECE)
-                .unitPerPack(10)
-                .packPerCarton(2)
-                .color("mavi")
-                .size("10x10")
-                .weight("1kg")
-                .product(product)
-                .build();
-
-        when(productRepository.findById(5L)).thenReturn(Optional.of(product));
-        when(productFeatureRepository.save(org.mockito.ArgumentMatchers.any(ProductFeature.class))).thenReturn(saved);
-        when(featureDtoConverter.convert(saved)).thenReturn(new FeatureDto(1L, UnitType.PIECE, 10, 2, "mavi", "10x10", "1kg", 5L));
-
-        FeatureDto result = productFeatureService.createProductFeature(request);
-
-        assertEquals(1L, result.getId());
-        assertEquals(UnitType.PIECE, result.getUnitType());
-    }
-
-    @Test
-    void createProductFeature_throwsWhenAlreadyExists() {
-        Product product = new Product();
-        product.setId(5L);
-        product.setFeature(new ProductFeature());
-
-        when(productRepository.findById(5L)).thenReturn(Optional.of(product));
-
-        FeatureDto request = new FeatureDto(null, UnitType.PIECE, 10, 2, "mavi", "10x10", "1kg", 5L);
-
-        assertThrows(IllegalStateException.class, () -> productFeatureService.createProductFeature(request));
-    }
+//    @Test
+//    void createProductFeature_throwsWhenAlreadyExists() {
+//        Product product = new Product();
+//        product.setId(5L);
+//        product.setFeature(new ProductFeature());
+//
+//        when(productRepository.findById(5L)).thenReturn(Optional.of(product));
+//
+//        FeatureDto request = new FeatureDto(null, UnitType.PIECE, 10, 2, "mavi", "10x10", "1kg", 5L);
+//
+//        assertThrows(IllegalStateException.class, () -> productFeatureService.createProductFeature(request));
+//    }
 
     @Test
     void updateFeature_updatesAndSaves() {

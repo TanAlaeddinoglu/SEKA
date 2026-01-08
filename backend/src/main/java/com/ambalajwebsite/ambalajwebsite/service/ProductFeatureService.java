@@ -1,5 +1,6 @@
 package com.ambalajwebsite.ambalajwebsite.service;
 
+import com.ambalajwebsite.ambalajwebsite.dto.CreateFeatureRequest;
 import com.ambalajwebsite.ambalajwebsite.dto.FeatureDto;
 import com.ambalajwebsite.ambalajwebsite.dto.FeatureDtoConverter;
 import com.ambalajwebsite.ambalajwebsite.model.Product;
@@ -26,8 +27,8 @@ public class ProductFeatureService {
         this.productRepository = productRepository;
     }
 
-    public FeatureDto createProductFeature(FeatureDto featureDto) {
-        Product product = productRepository.findById(featureDto.getProductId())
+    public FeatureDto createProductFeature(CreateFeatureRequest featureRequest) {
+        Product product = productRepository.findById(featureRequest.getProductId())
                 .orElseThrow(() -> (new EntityNotFoundException("Product not found")));
 
         if (product.getFeature() != null) {
@@ -37,12 +38,12 @@ public class ProductFeatureService {
         }
 
         ProductFeature feature = new ProductFeature();
-        feature.setUnit(featureDto.getUnitType());
-        feature.setUnitPerPack(featureDto.getUnitPerPack());
-        feature.setPackPerCarton(featureDto.getUnitPerCarton());
-        feature.setColor(featureDto.getColor());
-        feature.setSize(featureDto.getSize());
-        feature.setWeight(featureDto.getWeight());
+        feature.setUnit(featureRequest.getUnitType());
+        feature.setUnitPerPack(featureRequest.getUnitPerPack());
+        feature.setPackPerCarton(featureRequest.getUnitPerCarton());
+        feature.setColor(featureRequest.getColor());
+        feature.setSize(featureRequest.getSize());
+        feature.setWeight(featureRequest.getWeight());
         feature.setProduct(product);
 
         ProductFeature productFeature = productFeatureRepository.save(feature);
@@ -52,7 +53,8 @@ public class ProductFeatureService {
     public FeatureDto getFeatureDtoById(Long id) {
         Optional<ProductFeature> productFeature = productFeatureRepository.findById(id);
 
-        return featureDtoConverter.convert(productFeature.orElseThrow());
+        return featureDtoConverter.convert(productFeature
+                .orElseThrow(() -> (new EntityNotFoundException("Product not found"))));
     }
 
     public List<FeatureDto> getAllProductsFeatures() {

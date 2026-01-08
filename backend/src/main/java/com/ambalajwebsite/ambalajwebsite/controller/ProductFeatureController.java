@@ -1,11 +1,11 @@
 package com.ambalajwebsite.ambalajwebsite.controller;
 
+import com.ambalajwebsite.ambalajwebsite.dto.CreateFeatureRequest;
 import com.ambalajwebsite.ambalajwebsite.dto.FeatureDto;
-import com.ambalajwebsite.ambalajwebsite.dto.ProductDto;
 import com.ambalajwebsite.ambalajwebsite.service.ProductFeatureService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -19,8 +19,8 @@ public class ProductFeatureController {
     }
 
     @PostMapping
-    public ResponseEntity<FeatureDto> createProductFeature(@RequestBody FeatureDto featureDto) {
-        return ResponseEntity.ok(productFeatureService.createProductFeature(featureDto));
+    public ResponseEntity<FeatureDto> createProductFeature(@Valid @RequestBody CreateFeatureRequest featureRequest) {
+        return ResponseEntity.ok(productFeatureService.createProductFeature(featureRequest));
     }
 
     @GetMapping
