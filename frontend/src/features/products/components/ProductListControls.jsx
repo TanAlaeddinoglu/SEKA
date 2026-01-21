@@ -1,13 +1,24 @@
 import "../styles/ProductListControls.css";
 
 export default function ProductListControls({
+                                                search,
                                                 sort,
                                                 size,
+                                                onSearchChange,
                                                 onSortChange,
                                                 onSizeChange,
                                             }) {
     return (
         <div className="product-controls">
+            <div className="control-item">
+                <label>Arama</label>
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                    placeholder="Ürün, marka, kategori..."
+                />
+            </div>
             <div className="control-item">
                 <label>Sıralama</label>
                 <select

@@ -15,6 +15,8 @@ export default function ProductTable({ products, onDelete }) {
                     <th>Marka</th>
                     <th>Slug</th>
                     <th>Açıklama</th>
+                    <th>Kategori</th>
+                    <th>Durum</th>
                     <th>Birim</th>
                     <th>Paket/Koli</th>
                     <th>Renk</th>
@@ -35,6 +37,17 @@ export default function ProductTable({ products, onDelete }) {
                         <td className="truncate description">
                             {p.description || "-"}
                         </td>
+                        <td>{p.categoryName || p.category?.categoryName || "-"}</td>
+                        <td>
+                            <span
+                                className={`status-badge ${
+                                    p.isActive ? "active" : "inactive"
+                                }`}
+                            >
+                                {p.isActive ? "Aktif" : "Pasif"}
+                            </span>
+                        </td>
+
 
                         <td>
                             {p.productFeature
@@ -104,6 +117,22 @@ export default function ProductTable({ products, onDelete }) {
                             }
                         />
                         <CardRow
+                            label="Kategori"
+                            value={p.categoryName || p.category?.categoryName || "-"}
+                        />
+                        <CardRow
+                            label="Durum"
+                            value={
+                                <span
+                                    className={`status-badge ${
+                                        p.isActive ? "active" : "inactive"
+                                    }`}
+                                >
+                                    {p.isActive ? "Aktif" : "Pasif"}
+                                </span>
+                            }
+                        />
+                        <CardRow
                             label="Renk"
                             value={p.productFeature?.color}
                         />
@@ -142,12 +171,12 @@ export default function ProductTable({ products, onDelete }) {
     );
 }
 
-/* --- Küçük yardımcı --- */
 function CardRow({ label, value, multiline }) {
+    const isReactElement = value && typeof value === "object";
     return (
         <div className={`card-row ${multiline ? "multiline" : ""}`}>
             <span>{label}</span>
-            <span>{value || "-"}</span>
+            <span>{isReactElement ? value : value || "-"}</span>
         </div>
     );
 }

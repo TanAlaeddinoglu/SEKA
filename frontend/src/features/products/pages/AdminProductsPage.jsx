@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 import ProductTable from "../components/ProductTable";
 import ProductListControls from "../components/ProductListControls";
-import { useProducts } from "../hooks/useProducts";
-import { useDeleteProduct } from "../hooks/useDeleteProduct";
+import {useProducts} from "../hooks/useProducts";
+import {useDeleteProduct} from "../hooks/useDeleteProduct";
 
 import "../styles/AdminProductsPage.css";
 
@@ -14,6 +14,8 @@ export default function AdminProductsPage() {
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
     const [sort, setSort] = useState("productName,asc");
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
 
     const deleteMutation = useDeleteProduct();
 
@@ -26,14 +28,21 @@ export default function AdminProductsPage() {
         deleteMutation.mutate(id);
     };
 
-    const { data, isLoading, isError } = useProducts({
+    useEffect(() => {
+        const handle = setTimeout(() => {
+            setDebouncedSearch(search.trim());
+        }, 300);
+        return () => clearTimeout(handle);
+    }, [search]);
+
+    const {data, isLoading, isError} = useProducts({
         page,
         size,
         sort,
+        search: debouncedSearch || undefined,
     });
 
-    if (isLoading) return <p>Yükleniyor...</p>;
-    if (isError || !data)
+    if (isError)
         return <p>Ürünler yüklenirken hata oluştu.</p>;
 
     return (
@@ -51,8 +60,13 @@ export default function AdminProductsPage() {
             </div>
 
             <ProductListControls
+                search={search}
                 sort={sort}
                 size={size}
+                onSearchChange={(value) => {
+                    setPage(0);
+                    setSearch(value.toLowerCase());
+                }}
                 onSortChange={(v) => {
                     setPage(0);
                     setSort(v);
@@ -63,29 +77,35 @@ export default function AdminProductsPage() {
                 }}
             />
 
-            <ProductTable
-                products={data.content}
-                onEdit={(p) =>
-                    navigate(`/admin/products/${p.id}`)
-                }
-                onDelete={(id) => handleDelete(id)}
-            />
+            {isLoading && !data ? (
+                <p>Yükleniyor...</p>
+            ) : (
+                <ProductTable
+                    products={data?.content || []}
+                    onEdit={(p) =>
+                        navigate(`/admin/products/${p.id}`)
+                    }
+                    onDelete={(id) => handleDelete(id)}
+                />
+            )}
 
             {/* PAGINATION */}
             <div className="pagination">
                 <button
-                    disabled={data.first}
+                    disabled={!data || data.first}
                     onClick={() => setPage((p) => p - 1)}
                 >
                     Önceki
                 </button>
 
                 <span>
-                    Sayfa {data.number + 1} / {data.totalPages}
+                    {data
+                        ? `Sayfa ${data.number + 1} / ${data.totalPages}`
+                        : "Sayfa - / -"}
                 </span>
 
                 <button
-                    disabled={data.last}
+                    disabled={!data || data.last}
                     onClick={() => setPage((p) => p + 1)}
                 >
                     Sonraki

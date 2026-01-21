@@ -6,6 +6,7 @@ export default function CategoryTable({ data, onEdit, onDelete }) {
             <thead>
             <tr>
                 <th>Kategori Adı</th>
+                <th>Ürün Sayısı</th>
                 <th>Durum</th>
                 <th />
             </tr>
@@ -14,6 +15,7 @@ export default function CategoryTable({ data, onEdit, onDelete }) {
             {data.map((c) => (
                 <tr key={c.id}>
                     <td>{c.categoryName}</td>
+                    <td>{c.productCount}</td>
                     <td>{c.isActive ? "Active" : "Passive"}</td>
                     <td className="category-actions">
                         <button className="edit" onClick={() => onEdit(c)}>

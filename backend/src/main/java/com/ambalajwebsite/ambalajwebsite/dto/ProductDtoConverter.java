@@ -23,8 +23,13 @@ public class ProductDtoConverter {
         dto.setName(product.getProductName());
         dto.setSlug(product.getSlug());
         dto.setBrand(product.getBrand());
+        dto.setCategory(convertCategory(product));
+        dto.setCategoryId(
+                product.getCategory() != null ? product.getCategory().getId() : null
+        );
         dto.setDescription(product.getDescription());
         dto.setProductFeature(featureDtoConverter.convert(product.getFeature()));
+        dto.setIsActive(product.isActive());
 
         if (product.getImages() != null) {
             dto.setImages(product.getImages()
@@ -37,4 +42,15 @@ public class ProductDtoConverter {
         return dto;
     }
 
+    private CategoryDto convertCategory(Product product) {
+        if (product.getCategory() == null) {
+            return null;
+        }
+        CategoryDto dto = new CategoryDto();
+        dto.setId(product.getCategory().getId());
+        dto.setCategoryName(product.getCategory().getCategoryName());
+        dto.setSlug(product.getCategory().getSlug());
+        dto.setIsActive(product.getCategory().isActive());
+        return dto;
+    }
 }

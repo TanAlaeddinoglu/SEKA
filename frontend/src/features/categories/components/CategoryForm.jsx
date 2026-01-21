@@ -7,20 +7,24 @@ export default function CategoryForm({ initialData, onSubmit, loading }) {
         isActive: true,
     });
 
-    useEffect(() => {
-        if (initialData) {
-            setForm({
-                categoryName: initialData.categoryName,
-                isActive: initialData.isActive,
-            });
+    const initialCategoryName = initialData?.categoryName ?? "";
+    const initialIsActive = initialData?.isActive ?? true;
 
-        } else {
-            setForm({
-                categoryName: "",
-                isActive: true,
-            });
-        }
-    }, [initialData]);
+    useEffect(() => {
+        setForm((prev) => {
+            const next = {
+                categoryName: initialCategoryName,
+                isActive: initialIsActive,
+            };
+            if (
+                prev.categoryName === next.categoryName &&
+                prev.isActive === next.isActive
+            ) {
+                return prev;
+            }
+            return next;
+        });
+    }, [initialCategoryName, initialIsActive]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -44,7 +48,7 @@ export default function CategoryForm({ initialData, onSubmit, loading }) {
             />
 
             <div className="active-row">
-                <label htmlFor="active-checkbox">Active</label>
+                <label htmlFor="active-checkbox">Aktif</label>
                 <input
                     id="active-checkbox"
                     type="checkbox"

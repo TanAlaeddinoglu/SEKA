@@ -1,0 +1,143 @@
+/* TABLE */
+.user-table {
+    width: 100%;
+    min-width: 720px; /* Desktop kolon rahatlığı */
+    border-collapse: collapse;
+    background: var(--color-white);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* TABLE HEAD */
+.user-table thead {
+    background: #f1f5f9;
+}
+
+.user-table th {
+    text-align: left;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* TABLE BODY */
+.user-table td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+/* STATUS */
+.user-status {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.user-status.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.user-status.passive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ACTIONS */
+.user-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.user-actions button {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.user-actions .edit {
+    background: #e0f2fe;
+}
+
+.user-actions .delete {
+    background: #fee2e2;
+}
+@media (max-width: 640px) {
+
+    /* RESET TABLE LAYOUT */
+    .user-table,
+    .user-table thead,
+    .user-table tbody,
+    .user-table tr,
+    .user-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* HIDE HEADER */
+    .user-table thead {
+        display: none;
+    }
+
+    /* CARD ROW */
+    .user-table tr {
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        padding: 10px;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    /* CARD CELL */
+    .user-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 6px 0;
+        border: none;
+        font-size: 14px;
+        line-height: 1.3;
+        word-break: break-word;
+    }
+
+    /* LABEL */
+    .user-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #475569;
+        flex-shrink: 0;
+        max-width: 40%;
+    }
+
+    /* VALUE */
+    .user-table td > * {
+        max-width: 60%;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    /* ACTIONS */
+    .user-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .user-actions button {
+        flex: 1;
+        padding: 10px;
+        font-size: 14px;
+    }
+}

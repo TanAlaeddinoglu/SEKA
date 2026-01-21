@@ -114,7 +114,11 @@ export default function ProductFeatureForm({
             />
 
             <button disabled={loading}>
-                {loading ? "Kaydediliyor..." : "Özellikleri Kaydet"}
+                {loading
+                    ? "Kaydediliyor..."
+                    : initialData
+                        ? "Özellikleri Güncelle"
+                        : "Özellikleri Kaydet"}
             </button>
         </form>
     );

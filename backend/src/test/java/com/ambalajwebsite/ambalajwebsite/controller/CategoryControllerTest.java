@@ -43,8 +43,16 @@ class CategoryControllerTest {
 
     @Test
     void createCategory_returnsDto() throws Exception {
-        CreateCategoryDto request = new CreateCategoryDto("Koli");
-        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of(),true);
+        CreateCategoryDto request = new CreateCategoryDto();
+        request.setCategoryName("Koli");
+        request.setIsActive(true);
+        CategoryDto response = new CategoryDto();
+        response.setId(1L);
+        response.setCategoryName("Koli");
+        response.setSlug("koli");
+        response.setProductCount(0);
+        response.setProducts(List.of());
+        response.setIsActive(true);
 
         when(categoryService.createCategory(any())).thenReturn(response);
 
@@ -59,7 +67,13 @@ class CategoryControllerTest {
 
     @Test
     void getAllCategories_returnsList() throws Exception {
-        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of(), true);
+        CategoryDto response = new CategoryDto();
+        response.setId(1L);
+        response.setCategoryName("Koli");
+        response.setSlug("koli");
+        response.setProductCount(0);
+        response.setProducts(List.of());
+        response.setIsActive(true);
         when(categoryService.getAllCategory()).thenReturn(List.of(response));
 
         mockMvc.perform(get("/v1/category/"))
@@ -70,7 +84,13 @@ class CategoryControllerTest {
 
     @Test
     void getCategoryById_returnsDto() throws Exception {
-        CategoryDto response = new CategoryDto(1L, "Koli", "koli", List.of(),true);
+        CategoryDto response = new CategoryDto();
+        response.setId(1L);
+        response.setCategoryName("Koli");
+        response.setSlug("koli");
+        response.setProductCount(0);
+        response.setProducts(List.of());
+        response.setIsActive(true);
         when(categoryService.getCategoryDtoById(1L)).thenReturn(response);
 
         mockMvc.perform(get("/v1/category/1"))
@@ -81,8 +101,16 @@ class CategoryControllerTest {
 
     @Test
     void partialUpdateCategory_returnsDto() throws Exception {
-        CategoryDto request = new CategoryDto(null, "Yeni", null, null,true);
-        CategoryDto response = new CategoryDto(1L, "Yeni", "yeni", List.of(),true);
+        CategoryDto request = new CategoryDto();
+        request.setCategoryName("Yeni");
+        request.setIsActive(true);
+        CategoryDto response = new CategoryDto();
+        response.setId(1L);
+        response.setCategoryName("Yeni");
+        response.setSlug("yeni");
+        response.setProductCount(0);
+        response.setProducts(List.of());
+        response.setIsActive(true);
 
         when(categoryService.updateCategory(any(), org.mockito.ArgumentMatchers.eq(1L))).thenReturn(response);
 

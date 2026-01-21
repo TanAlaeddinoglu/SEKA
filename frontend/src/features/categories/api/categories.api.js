@@ -6,9 +6,10 @@ export const CategoryAPI = {
         return res.data;
     },
 
-    create: async ({ categoryName }) => {
+    create: async ({ categoryName, isActive }) => {
         const res = await httpClient.post("/v1/category/", {
             categoryName,
+            isActive,
         });
         return res.data;
     },
