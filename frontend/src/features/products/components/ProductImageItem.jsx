@@ -4,6 +4,7 @@ export default function ProductImageItem({
                                              image,
                                              onDelete,
                                              onSetCover,
+                                             onPreview,
                                          }) {
     return (
         <div className="product-image-item">
@@ -11,7 +12,18 @@ export default function ProductImageItem({
                 <span className="cover-badge">Kapak</span>
             )}
 
-            <img src={image.url} alt="Ürün görseli" />
+            <img
+                src={image.url}
+                alt="Ürün görseli"
+                onClick={() => onPreview?.(image)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        onPreview?.(image);
+                    }
+                }}
+            />
 
             <div className="image-actions">
                 {!image.cover && (

@@ -34,6 +34,9 @@ public class CategoryService {
         Category category = new Category();
         category.setCategoryName(categoryDto.getCategoryName());
         category.setSlug(uniqueSlug);
+        if (categoryDto.getIsActive() != null) {
+            category.setActive(categoryDto.getIsActive());
+        }
 
         Category saved = categoryRepository.save(category);
         return categoryDtoConverter.convert(saved);
@@ -67,8 +70,12 @@ public class CategoryService {
                     slug -> categoryRepository.existsBySlugAndIdNot(slug, id));
             category.setSlug(uniqueSlug);
         }
+        if (categoryDto.getIsActive() != null) {
+            category.setActive(categoryDto.getIsActive());
+        }
 
-        return categoryDtoConverter.convert(category);
+        Category saved = categoryRepository.save(category);
+        return categoryDtoConverter.convert(saved);
     }
 
     public void deleteCategoryById(Long id) {

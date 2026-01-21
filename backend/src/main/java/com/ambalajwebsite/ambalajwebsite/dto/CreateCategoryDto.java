@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 
 @Getter
 @Setter
@@ -13,4 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateCategoryDto {
     private String categoryName;
+    private Boolean isActive;
 }

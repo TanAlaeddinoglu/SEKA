@@ -1,17 +1,18 @@
 package com.ambalajwebsite.ambalajwebsite.controller;
 
-import com.ambalajwebsite.ambalajwebsite.dto.AuthRequest;
-import com.ambalajwebsite.ambalajwebsite.dto.CreateUserRequest;
-import com.ambalajwebsite.ambalajwebsite.dto.UserDto;
-import com.ambalajwebsite.ambalajwebsite.dto.UserDtoConverter;
-import com.ambalajwebsite.ambalajwebsite.service.JwtService;
-import com.ambalajwebsite.ambalajwebsite.service.UserService;
+import java.util.List;
+
+import com.ambalajwebsite.ambalajwebsite.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import com.ambalajwebsite.ambalajwebsite.service.JwtService;
+import com.ambalajwebsite.ambalajwebsite.service.UserService;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -34,11 +35,6 @@ public class UserController {
         this.userDtoConverter = userDtoConverter;
     }
 
-    @GetMapping("/welcome")
-    public String welcome() {
-        return "Hello World! this is FOLSDEV";
-    }
-
     @PostMapping("/addNewUser")
     public ResponseEntity<UserDto> addUser(@RequestBody CreateUserRequest request) {
         return ResponseEntity.ok(userDtoConverter.convert(service.createUser(request)));
@@ -49,45 +45,30 @@ public class UserController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.username, request.password));
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken((org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal());
+            return jwtService.generateToken((UserDetails) authentication.getPrincipal());
         }
         throw new UsernameNotFoundException("invalid username {} " + request.username);
     }
 
-    @GetMapping("/user")
-    public String getUserString() {
-        return "This is USER!";
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        return ResponseEntity.ok(service.getAllUsers());
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<UserDto>> getAllUsers() {
-//        return ResponseEntity.ok(service.getAllUsers());
-//    }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<UserDto> getUserById(@PathVariable("id")  Long id) {
-//        return ResponseEntity.ok(service.getUserById(id));
-//
-//    }
-//
-//    @PostMapping
-//    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest userRequest) {
-//        return ResponseEntity.ok(service.createUser(userRequest));
-//    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<User> updateUser(@RequestBody UpdateUserRequest updateUserRequest){
-//        return ResponseEntity.ok(service.updateUser(updateUserRequest));
-//    }
-//
-//    @PatchMapping("/{id}")
-//    public ResponseEntity<User> deactivateUser(@PathVariable("id") long id) {
-//        service.deactiveUser(id);
-//                return ResponseEntity.ok().build();
-//    }
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<User> deleteUser(@PathVariable("id") long id) {
-//        service.deleteUser(id);
-//        return ResponseEntity.ok().build();
-//    }
+    @GetMapping("/{username}")
+    public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(service.getUserByUsername(username));
+
+    }
+
+    @PatchMapping("/{username}")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UpdateUserRequest updateUserRequest, @PathVariable String username){
+        return ResponseEntity.ok(service.updateUser(username, updateUserRequest));
+    }
+
+   @DeleteMapping("/{username}")
+   public ResponseEntity deleteUser(@PathVariable String username) {
+       service.deleteUser(username);
+       return ResponseEntity.ok().build();
+   }
 }

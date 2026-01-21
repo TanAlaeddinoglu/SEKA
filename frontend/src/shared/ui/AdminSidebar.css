@@ -4,6 +4,17 @@
     background: rgba(0, 0, 0, 0.3);
     z-index: 20;
 }
+.sidebar-link {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.sidebar-link.active {
+    background: #eef2ff;
+}
 
 .sidebar {
     width: var(--sidebar-width);

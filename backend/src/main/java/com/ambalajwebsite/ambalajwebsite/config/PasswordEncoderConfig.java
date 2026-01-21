@@ -11,4 +11,7 @@ public class PasswordEncoderConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    public String encode(String password) {
+        return bCryptPasswordEncoder().encode(password);
+    }
 }

@@ -56,7 +56,14 @@ class ProductServiceTest {
         saved.setDescription("Aciklama");
 
         when(productRepository.save(org.mockito.ArgumentMatchers.any(Product.class))).thenReturn(saved);
-        when(productDtoConverter.convert(saved)).thenReturn(new ProductDto(1L, "Urun", "urun", "Marka", null, "Aciklama", List.of()));
+        ProductDto createdDto = new ProductDto();
+        createdDto.setId(1L);
+        createdDto.setName("Urun");
+        createdDto.setSlug("urun");
+        createdDto.setBrand("Marka");
+        createdDto.setDescription("Aciklama");
+        createdDto.setImages(List.of());
+        when(productDtoConverter.convert(saved)).thenReturn(createdDto);
 
         ProductDto result = productService.createProduct(new CreateProductRequest("Urun", "Marka", 2L, "Aciklama"));
 
@@ -75,7 +82,10 @@ class ProductServiceTest {
         product.setProductName("Urun");
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(productDtoConverter.convert(product)).thenReturn(new ProductDto(1L, "Urun", "urun", null, null, null, List.of()));
+        ProductDto dto = new ProductDto();
+        dto.setId(1L);
+        dto.setName("Urun");
+        when(productDtoConverter.convert(product)).thenReturn(dto);
 
         ProductDto result = productService.getProductDtoById(1L);
         assertEquals(1L, result.getId());
@@ -91,7 +101,14 @@ class ProductServiceTest {
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productRepository.existsBySlugAndIdNot("yeni", 1L)).thenReturn(false);
         when(productRepository.save(product)).thenReturn(product);
-        when(productDtoConverter.convert(product)).thenReturn(new ProductDto(1L, "Yeni", "yeni", "Marka", null, "Aciklama", List.of()));
+        ProductDto updatedDto = new ProductDto();
+        updatedDto.setId(1L);
+        updatedDto.setName("Yeni");
+        updatedDto.setSlug("yeni");
+        updatedDto.setBrand("Marka");
+        updatedDto.setDescription("Aciklama");
+        updatedDto.setImages(List.of());
+        when(productDtoConverter.convert(product)).thenReturn(updatedDto);
 
         ProductDto request = new ProductDto();
         request.setName("Yeni");

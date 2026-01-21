@@ -34,6 +34,18 @@
     resize: vertical;
 }
 
+.product-form .active-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-form .active-row input[type="checkbox"] {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+}
+
 .product-form button {
     padding: 14px;
     font-size: 16px;

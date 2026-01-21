@@ -1,16 +1,16 @@
 package com.ambalajwebsite.ambalajwebsite;
 
-import com.ambalajwebsite.ambalajwebsite.model.Category;
-import com.ambalajwebsite.ambalajwebsite.model.Product;
-import com.ambalajwebsite.ambalajwebsite.model.ProductFeature;
-import com.ambalajwebsite.ambalajwebsite.model.UnitType;
-import com.ambalajwebsite.ambalajwebsite.repository.CategoryRepository;
-import com.ambalajwebsite.ambalajwebsite.repository.ProductFeatureRepository;
-import com.ambalajwebsite.ambalajwebsite.repository.ProductRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.ambalajwebsite.ambalajwebsite.config.PasswordEncoderConfig;
+import com.ambalajwebsite.ambalajwebsite.repository.CategoryRepository;
+import com.ambalajwebsite.ambalajwebsite.repository.ProductFeatureRepository;
+import com.ambalajwebsite.ambalajwebsite.repository.ProductRepository;
+import com.ambalajwebsite.ambalajwebsite.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @SpringBootApplication
 public class AmbalajWebsiteApplication implements CommandLineRunner {
@@ -18,13 +18,18 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ProductFeatureRepository productFeatureRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoderConfig passwordEncoder;
 
-    public AmbalajWebsiteApplication(CategoryRepository categoryRepository, ProductRepository productRepository, ProductFeatureRepository productFeatureRepository) {
+    public AmbalajWebsiteApplication(CategoryRepository categoryRepository, ProductRepository productRepository, ProductFeatureRepository productFeatureRepository, UserRepository userRepository, PasswordEncoderConfig passwordEncoder) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.productFeatureRepository = productFeatureRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    
     public static void main(String[] args) {
         SpringApplication.run(AmbalajWebsiteApplication.class, args);
     }
@@ -32,6 +37,20 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+        // User user = User.builder()
+        //         .name("Admin")
+        //         .surname("Admin")
+        //         .username("admin")
+        //         .password(passwordEncoder.encode("123456"))
+        //         .email("admin@example.com")
+        //         .accountNonExpired(true)
+        //         .isEnabled(true)
+        //         .accountNonLocked(true)
+        //         .credentialsNonExpired(true)
+        //         .authorities(Set.of(ROLE_ADMIN))
+        //         .build();
+        // User savedUser = userRepository.save(user);
+
 //        Category category = Category.builder()
 //                .categoryName("Kategori-2")
 //                .slug("Kategori-2")

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,7 +17,10 @@ public class ProductDto {
     private String name;
     private String slug;
     private String brand;
+    private CategoryDto category;
+    private Long categoryId;
     private FeatureDto productFeature;
     private String description;
-    private java.util.List<ProductImageDto> images;
+    private List<ProductImageDto> images;
+    private Boolean isActive;
 }

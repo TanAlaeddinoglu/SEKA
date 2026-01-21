@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import ProductForm from "../components/ProductForm";
 import ProductFeatureForm from "../components/ProductFeatureForm";
@@ -19,8 +20,9 @@ export default function AdminProductCreatePage() {
 
     const [productId, setProductId] = useState(null);
     const [featureId, setFeatureId] = useState(null);
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState(null); // success | error
+    const [featureSkipped, setFeatureSkipped] = useState(false);
+    const [imagesSkipped, setImagesSkipped] = useState(false);
+    const [finalToastShown, setFinalToastShown] = useState(false);
 
     const createProductMutation = useCreateProduct();
     const createFeatureMutation = useCreateProductFeature();
@@ -29,19 +31,21 @@ export default function AdminProductCreatePage() {
     const { data: images } = useProductImages(productId);
     const uploadMutation = useUploadProductImages(productId);
 
+    const featureCompleted = Boolean(featureId || featureSkipped);
+    const imagesCompleted = Boolean(
+        (images && images.length > 0) || imagesSkipped
+    );
+
     /* ÜRÜN OLUŞTUR */
     const handleCreateProduct = (payload) => {
-        setMessage(null);
-
         createProductMutation.mutate(payload, {
             onSuccess: (createdProduct) => {
                 setProductId(createdProduct.id);
-                setMessage("Ürün başarıyla oluşturuldu.");
-                setMessageType("success");
-            },
-            onError: () => {
-                setMessage("Ürün oluşturulurken hata oluştu.");
-                setMessageType("error");
+                setFeatureId(null);
+                setFeatureSkipped(false);
+                setImagesSkipped(false);
+                setFinalToastShown(false);
+                toast.success("Ürün başarıyla oluşturuldu.");
             },
         });
     };
@@ -56,20 +60,15 @@ export default function AdminProductCreatePage() {
                 {
                     onSuccess: (res) => {
                         setFeatureId(res.id);
-                        setMessage("Ürün özellikleri kaydedildi.");
-                        setMessageType("success");
-                    },
-                    onError: () => {
-                        setMessage("Özellikler kaydedilemedi.");
-                        setMessageType("error");
+                        setFeatureSkipped(false);
+                        toast.success("Ürün özellikleri kaydedildi.");
                     },
                 }
             );
         } else {
             updateFeatureMutation.mutate(payload, {
                 onSuccess: () => {
-                    setMessage("Ürün özellikleri güncellendi.");
-                    setMessageType("success");
+                    toast.success("Ürün özellikleri güncellendi.");
                 },
             });
         }
@@ -77,17 +76,21 @@ export default function AdminProductCreatePage() {
 
     /* TÜM SÜREÇ TAMAMLANDI */
     useEffect(() => {
-        if (productId && featureId && images?.length > 0) {
-            setMessage("Ürün tamamen kaydedildi. Yönlendiriliyorsunuz...");
-            setMessageType("success");
-
-            const t = setTimeout(() => {
-                navigate("/admin/products");
-            }, 2000);
-
-            return () => clearTimeout(t);
+        if (
+            productId &&
+            featureCompleted &&
+            imagesCompleted &&
+            !finalToastShown
+        ) {
+            toast("Tüm adımlar tamamlandı. Ürün kaydı hazır.");
+            setFinalToastShown(true);
         }
-    }, [productId, featureId, images, navigate]);
+    }, [
+        productId,
+        featureCompleted,
+        imagesCompleted,
+        finalToastShown,
+    ]);
 
     return (
         <div className="product-create-page">
@@ -103,16 +106,11 @@ export default function AdminProductCreatePage() {
                 </button>
             </div>
 
-            {/* GLOBAL MESSAGE */}
-            {message && (
-                <div className={`alert ${messageType}`}>
-                    {message}
-                </div>
-            )}
-
             {/* ADIM 1 */}
             <section className="create-section">
-                <h3>1. Ürün Bilgileri</h3>
+                <div className="section-header">
+                    <h3>1. Ürün Bilgileri</h3>
+                </div>
                 <p className="step-info">
                     Öncelikle ürünün temel bilgilerini ve kategorisini oluşturun.
                 </p>
@@ -125,9 +123,24 @@ export default function AdminProductCreatePage() {
 
             {/* ADIM 2 */}
             <section
-                className={`create-section ${!productId ? "disabled" : ""}`}
+                className={`create-section ${
+                    !productId || featureSkipped ? "disabled" : ""
+                }`}
             >
-                <h3>2. Ürün Özellikleri</h3>
+                <div className="section-header">
+                    <h3>2. Ürün Özellikleri</h3>
+                    <button
+                        className="skip-button"
+                        type="button"
+                        disabled={!productId || featureCompleted}
+                        onClick={() => {
+                            setFeatureSkipped(true);
+                            toast("Ürün özellikleri adımı atlandı.");
+                        }}
+                    >
+                        Atla
+                    </button>
+                </div>
 
                 {!productId && (
                     <p className="step-info">
@@ -135,7 +148,13 @@ export default function AdminProductCreatePage() {
                     </p>
                 )}
 
-                {productId && (
+                {productId && featureSkipped && (
+                    <p className="step-info">
+                        Bu adım atlandı. Sonraki adıma geçebilirsiniz.
+                    </p>
+                )}
+
+                {productId && !featureSkipped && (
                     <ProductFeatureForm
                         onSubmit={handleFeatureSubmit}
                         loading={
@@ -148,9 +167,26 @@ export default function AdminProductCreatePage() {
 
             {/* ADIM 3 */}
             <section
-                className={`create-section ${!productId ? "disabled" : ""}`}
+                className={`create-section ${
+                    !productId || !featureCompleted || imagesSkipped
+                        ? "disabled"
+                        : ""
+                }`}
             >
-                <h3>3. Ürün Görselleri</h3>
+                <div className="section-header">
+                    <h3>3. Ürün Görselleri</h3>
+                    <button
+                        className="skip-button"
+                        type="button"
+                        disabled={!productId || !featureCompleted || imagesCompleted}
+                        onClick={() => {
+                            setImagesSkipped(true);
+                            toast("Görsel yükleme adımı atlandı.");
+                        }}
+                    >
+                        Atla
+                    </button>
+                </div>
 
                 {!productId && (
                     <p className="step-info">
@@ -158,12 +194,28 @@ export default function AdminProductCreatePage() {
                     </p>
                 )}
 
-                {productId && (
+                {productId && !featureCompleted && (
+                    <p className="step-info">
+                        Görsel eklemek için önce özellik adımını tamamlamalısınız.
+                    </p>
+                )}
+
+                {productId && featureCompleted && imagesSkipped && (
+                    <p className="step-info">
+                        Bu adım atlandı. Ürün oluşturma tamamlandı.
+                    </p>
+                )}
+
+                {productId && featureCompleted && !imagesSkipped && (
                     <>
                         <ProductImageUploader
                             loading={uploadMutation.isLoading}
                             onUpload={(files) =>
-                                uploadMutation.mutate(files)
+                                uploadMutation.mutate(files, {
+                                    onSuccess: () => {
+                                        toast.success("Görseller yüklendi.");
+                                    },
+                                })
                             }
                         />
 
@@ -171,6 +223,17 @@ export default function AdminProductCreatePage() {
                     </>
                 )}
             </section>
+
+            {productId && featureCompleted && imagesCompleted && (
+                <div className="final-actions">
+                    <button
+                        className="back-button"
+                        onClick={() => navigate("/admin/products")}
+                    >
+                        Geri Dön
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

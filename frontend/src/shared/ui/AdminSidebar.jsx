@@ -14,10 +14,13 @@ export default function AdminSidebar({ open, onClose }) {
                         Dashboard
                     </NavLink>
                     <NavLink to="/admin/categories">
-                        Categories
+                        Kategoriler
                     </NavLink>
                     <NavLink to="/admin/products">
-                        Products
+                        Ürünler
+                    </NavLink>
+                    <NavLink to="/admin/users" className="sidebar-link" onClick={onClose}>
+                        Kullanıcılar
                     </NavLink>
                 </nav>
             </aside>

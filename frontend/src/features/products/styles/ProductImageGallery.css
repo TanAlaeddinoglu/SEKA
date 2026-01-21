@@ -5,18 +5,20 @@
     margin-top: 12px;
 }
 
-.image-item {
+.product-image-item {
     position: relative;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--color-border);
+    background: white;
 }
 
-.image-item img {
+.product-image-item img {
     width: 100%;
     height: 120px;
     object-fit: cover;
     display: block;
+    cursor: zoom-in;
 }
 
 /* Kapak etiketi */
@@ -37,7 +39,53 @@
         grid-template-columns: repeat(4, 1fr);
     }
 
-    .image-item img {
+    .product-image-item img {
         height: 140px;
     }
+}
+
+@media (min-width: 1200px) {
+    .image-gallery {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.image-preview-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 9999;
+}
+
+.image-preview-dialog {
+    background: white;
+    border-radius: 12px;
+    max-width: 960px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+}
+
+.image-preview-dialog img {
+    width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    background: #0f172a;
+    border-radius: 8px;
+}
+
+.image-preview-close {
+    align-self: flex-end;
+    border: 1px solid var(--color-border);
+    background: white;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
 }

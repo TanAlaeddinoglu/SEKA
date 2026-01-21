@@ -14,6 +14,7 @@ export default function ProductForm({
         brand: "",
         categoryId: "",
         description: "",
+        isActive: true,
     });
 
     useEffect(() => {
@@ -21,8 +22,12 @@ export default function ProductForm({
             setForm({
                 name: initialData.name ?? "",
                 brand: initialData.brand ?? "",
-                categoryId: initialData.categoryId ?? "",
+                categoryId:
+                    initialData.categoryId ??
+                    initialData.category?.id ??
+                    "",
                 description: initialData.description ?? "",
+                isActive: initialData.isActive ?? true,
             });
         }
     }, [initialData]);
@@ -31,12 +36,18 @@ export default function ProductForm({
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        onSubmit({
+        const payload = {
             name: form.name,
             brand: form.brand,
             categoryId: Number(form.categoryId),
             description: form.description,
-        });
+        };
+
+        if (initialData) {
+            payload.isActive = form.isActive;
+        }
+
+        onSubmit(payload);
     };
 
     return (
@@ -90,8 +101,25 @@ export default function ProductForm({
                 rows={3}
             />
 
+            {initialData && (
+                <div className="active-row">
+                    <label htmlFor="product-active">Aktif</label>
+                    <input
+                        id="product-active"
+                        type="checkbox"
+                        checked={form.isActive}
+                        onChange={(e) =>
+                            setForm({
+                                ...form,
+                                isActive: e.target.checked,
+                            })
+                        }
+                    />
+                </div>
+            )}
+
             <button disabled={loading}>
-                {loading ? "Kaydediliyor..." : "Kaydet"}
+                {loading ? "Güncelleniyor..." : "Güncelle"}
             </button>
         </form>
     );

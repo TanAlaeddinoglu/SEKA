@@ -2,19 +2,17 @@
 # BACKEND (Spring Boot)
 ################################
 backend/target/
-backend/.mvn/wrapper/maven-wrapper.jar
 backend/HELP.md
 
 # Spring env & secrets
 backend/.env
 backend/.env.local
-backend/.env.example
 backend/credentials.json
 backend/private_key.pem
 backend/public_key.pem
 
 # MinIO data (LOCAL ONLY)
-backend/minio-data/
+minio-data/
 
 ################################
 # FRONTEND (Vite / React)
@@ -23,6 +21,7 @@ frontend/node_modules/
 frontend/dist/
 frontend/.env
 frontend/.env.local
+frontend/src/test/
 
 ################################
 # IDE & OS

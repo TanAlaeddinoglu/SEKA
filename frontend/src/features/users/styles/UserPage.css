@@ -1,0 +1,96 @@
+/* =========================
+   PAGE ROOT
+========================= */
+.admin-users-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* =========================
+   HEADER
+========================= */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.page-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* =========================
+   ADD USER BUTTON
+========================= */
+.add-user-btn {
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: none;
+    background: var(--color-primary);
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.add-user-btn:hover {
+    background: var(--color-primary-dark, #1e40af);
+}
+
+.add-user-btn:active {
+    transform: scale(0.97);
+}
+
+/* =========================
+   CONTENT SPACING
+========================= */
+.admin-users-page > *:not(.page-header) {
+    width: 100%;
+}
+
+/* =========================
+   MOBILE OPTIMIZATION
+========================= */
+@media (max-width: 640px) {
+    .admin-users-page {
+        padding: 0 12px; /* 🔥 KRİTİK: card taşmasını engeller */
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .page-header h2 {
+        font-size: 18px;
+    }
+
+    .add-user-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+/* =========================
+   DESKTOP / LARGE SCREENS
+========================= */
+@media (min-width: 1024px) {
+    .admin-users-page {
+        max-width: 1200px;
+        margin: 0 auto; /* ortala */
+        padding: 0 16px; /* kenar nefesi */
+    }
+}

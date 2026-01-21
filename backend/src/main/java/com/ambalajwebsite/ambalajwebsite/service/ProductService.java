@@ -1,6 +1,11 @@
 package com.ambalajwebsite.ambalajwebsite.service;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import com.ambalajwebsite.ambalajwebsite.dto.CreateProductRequest;
 import com.ambalajwebsite.ambalajwebsite.dto.ProductDto;
 import com.ambalajwebsite.ambalajwebsite.dto.ProductDtoConverter;
@@ -10,11 +15,8 @@ import com.ambalajwebsite.ambalajwebsite.repository.CategoryRepository;
 import com.ambalajwebsite.ambalajwebsite.repository.ProductRepository;
 import com.ambalajwebsite.ambalajwebsite.util.ProductSpecification;
 import com.ambalajwebsite.ambalajwebsite.util.SlugGenerator;
+
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
 
 @Service
@@ -86,6 +88,14 @@ public class ProductService {
         if (productDto.getDescription() != null) {
             product.setDescription(productDto.getDescription());
         }
+        if (productDto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(productDto.getCategoryId())
+                    .orElseThrow(() -> new EntityNotFoundException("Category not found with id:" + productDto.getCategoryId()));
+            product.setCategory(category);
+        }
+        if (productDto.getIsActive() != null) {
+            product.setActive(productDto.getIsActive());
+        }
 
         Product savedProduct = productRepository.save(product);
         return productDtoConverter.convert(savedProduct);
@@ -101,7 +111,7 @@ public class ProductService {
 
     public void deleteProduct(Long id) throws Exception {
         Product product = productRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("Category not found with id:" + id));
+                .orElseThrow(()-> new EntityNotFoundException("Product not found with id:" + id));
 
         productImageService.deleteAllForProduct(id);
         productRepository.delete(product);

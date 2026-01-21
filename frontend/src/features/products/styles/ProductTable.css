@@ -1,11 +1,29 @@
-/* ===== Genel ===== */
+/* ============================= */
+/* ===== DESKTOP TABLE ===== */
+/* ============================= */
 
-.desktop-only {
-    display: none;
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-white);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.mobile-only {
-    display: block;
+.product-table th,
+.product-table td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.product-table th {
+    background: #f1f5f9;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .bold {
@@ -20,49 +38,62 @@
 }
 
 .description {
-    max-width: 200px;
+    max-width: 220px;
 }
 
-/* ===== DESKTOP TABLE ===== */
+/* ============================= */
+/* ===== STATUS BADGE ===== */
+/* ============================= */
 
-.product-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--color-white);
-    border-radius: 8px;
-    overflow: hidden;
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 999px;
+    white-space: nowrap;
 }
 
-.product-table th,
-.product-table td {
-    padding: 10px;
-    border-bottom: 1px solid var(--color-border);
-    text-align: left;
-    font-size: 14px;
-    vertical-align: top;
+.status-badge.active {
+    background: #dcfce7;
+    color: #166534;
 }
 
-.product-table th {
-    background: #f1f5f9;
+.status-badge.inactive {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
-.product-table .actions {
+/* ============================= */
+/* ===== ACTIONS ===== */
+/* ============================= */
+
+.actions {
     display: flex;
-    gap: 6px;
+    gap: 8px;
 }
 
-.product-table button {
+.actions button {
     padding: 6px 10px;
     border-radius: 4px;
     border: none;
     cursor: pointer;
+    font-size: 13px;
 }
 
-.product-table button.danger {
+.actions button:hover {
+    opacity: 0.9;
+}
+
+.actions .danger {
     background: #fee2e2;
 }
 
+/* ============================= */
 /* ===== MOBILE CARDS ===== */
+/* ============================= */
 
 .product-cards {
     display: flex;
@@ -75,50 +106,48 @@
     border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 12px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .card-title {
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    font-size: 15px;
 }
 
+/* 🔑 KRİTİK KISIM */
 .card-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 8px;
     font-size: 13px;
     margin-bottom: 6px;
 }
 
+.card-row span:first-child {
+    font-weight: 500;
+    color: #475569;
+}
+
 .card-row span:last-child {
-    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     max-width: 60%;
+    text-align: right;
     word-break: break-word;
 }
 
-.card-row.multiline {
-    flex-direction: column;
-}
+/* ============================= */
+/* ===== CARD ACTIONS ===== */
+/* ============================= */
 
 .card-actions {
     display: flex;
     gap: 8px;
-    margin-top: 10px;
-}
-.card-row .card-description {
-    text-align: right;
-    max-width: 60%;
-
-    display: -webkit-box;
-    -webkit-line-clamp: 2;      /* 👈 maksimum 3 satır */
-    -webkit-box-orient: vertical;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    font-size: 13px;
-    color: #475569;
-    line-height: 1.4;
+    margin-top: 12px;
 }
 
 .card-actions button {
@@ -126,17 +155,28 @@
     padding: 10px;
     border-radius: 6px;
     border: none;
+    cursor: pointer;
 }
 
-.card-actions button.danger {
+.card-actions .danger {
     background: #fee2e2;
 }
 
-/* ===== BREAKPOINT ===== */
+/* ============================= */
+/* ===== RESPONSIVE ===== */
+/* ============================= */
+
+.desktop-only {
+    display: none;
+}
+
+.mobile-only {
+    display: block;
+}
 
 @media (min-width: 1024px) {
     .desktop-only {
-        display: table;
+        display: block;
     }
 
     .mobile-only {

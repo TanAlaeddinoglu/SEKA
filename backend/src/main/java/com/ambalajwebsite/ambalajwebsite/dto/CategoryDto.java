@@ -1,6 +1,5 @@
 package com.ambalajwebsite.ambalajwebsite.dto;
 
-import com.ambalajwebsite.ambalajwebsite.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +15,7 @@ public class CategoryDto {
     private Long id;
     private String categoryName;
     private String slug;
+    private Integer productCount;
     private List<ProductDto> products;
-    private boolean isActive;
+    private Boolean isActive;
 }
