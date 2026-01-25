@@ -3,9 +3,12 @@ import { useState } from "react";
 import {useUsers} from "../hooks/useUsers.js";
 import { useCreateUser } from "../hooks/useCreateUser";
 import { useUpdateUser } from "../hooks/useUpdateUser";
+import { useDeleteUser } from "../hooks/useDeleteUser";
+import toast from "react-hot-toast";
 
 import UserTable from "../components/UserTable";
 import UserForm from "../components/UserFormModal.jsx";
+import ConfirmModal from "../../../shared/components/ConfirmModal";
 
 import "../styles/UserPage.css";
 
@@ -14,10 +17,13 @@ export default function AdminUsersPage() {
 
     const createMutation = useCreateUser();
     const updateMutation = useUpdateUser();
+    const deleteMutation = useDeleteUser();
 
     const [modalOpen, setModalOpen] = useState(false);
     const [mode, setMode] = useState("create"); // create | edit
     const [selectedUser, setSelectedUser] = useState(null);
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
 
     const openCreateModal = () => {
@@ -58,6 +64,33 @@ export default function AdminUsersPage() {
         }
     };
 
+    const openDeleteModal = (username) => {
+        setDeleteTarget(username);
+        setDeleteModalOpen(true);
+    };
+
+    const closeDeleteModal = () => {
+        if (deleteMutation.isLoading) return;
+        setDeleteModalOpen(false);
+        setDeleteTarget(null);
+    };
+
+    const confirmDelete = () => {
+        if (!deleteTarget) return;
+
+        deleteMutation.mutate(deleteTarget, {
+            onSuccess: (message) => {
+                toast.success(
+                    message || "Kullanıcı silindi."
+                );
+            },
+            onSettled: () => {
+                setDeleteModalOpen(false);
+                setDeleteTarget(null);
+            },
+        });
+    };
+
     if (isLoading) return <p>Yükleniyor...</p>;
     if (isError) return <p>Kullanıcılar yüklenemedi.</p>;
 
@@ -79,11 +112,7 @@ export default function AdminUsersPage() {
             <UserTable
                 users={data}
                 onEdit={(user) => openEditModal(user)}
-                onDelete={(username) => {
-                    alert(
-                        "Silme işlemini bir sonraki adımda ekleyeceğiz"
-                    );
-                }}
+                onDelete={(username) => openDeleteModal(username)}
             />
 
             {/* MODAL */}
@@ -97,6 +126,19 @@ export default function AdminUsersPage() {
                     createMutation.isLoading ||
                     updateMutation.isLoading
                 }
+            />
+
+            <ConfirmModal
+                open={deleteModalOpen}
+                title="Kullanici Sil"
+                message="Kullaniciyi Silmek IStiyormusunuz?"
+                confirmText="Sil"
+                cancelText="Iptal"
+                loadingText="Siliniyor..."
+                onConfirm={confirmDelete}
+                onCancel={closeDeleteModal}
+                loading={deleteMutation.isLoading}
+                danger
             />
         </div>
     );

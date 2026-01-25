@@ -1,5 +1,6 @@
 package com.ambalajwebsite.ambalajwebsite;
 
+import com.ambalajwebsite.ambalajwebsite.model.User;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,19 +38,19 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        // User user = User.builder()
-        //         .name("Admin")
-        //         .surname("Admin")
-        //         .username("admin")
-        //         .password(passwordEncoder.encode("123456"))
-        //         .email("admin@example.com")
-        //         .accountNonExpired(true)
-        //         .isEnabled(true)
-        //         .accountNonLocked(true)
-        //         .credentialsNonExpired(true)
-        //         .authorities(Set.of(ROLE_ADMIN))
-        //         .build();
-        // User savedUser = userRepository.save(user);
+//         User user = User.builder()
+//                 .name("Admin")
+//                 .surname("Admin")
+//                 .username("admin")
+//                 .password(passwordEncoder.encode("123456"))
+//                 .email("admin@example.com")
+//                 .accountNonExpired(true)
+//                 .isEnabled(true)
+//                 .accountNonLocked(true)
+//                 .credentialsNonExpired(true)
+//                 .authorities(Set.of(ROLE_ADMIN))
+//                 .build();
+//         User savedUser = userRepository.save(user);
 
 //        Category category = Category.builder()
 //                .categoryName("Kategori-2")

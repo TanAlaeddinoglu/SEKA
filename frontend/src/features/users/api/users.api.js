@@ -23,4 +23,11 @@ export const UserAPI = {
         );
         return res.data;
     },
+
+    delete: async (username) => {
+        const res = await httpClient.delete(
+            `/v1/auth/${username}`
+        );
+        return res.data;
+    },
 };

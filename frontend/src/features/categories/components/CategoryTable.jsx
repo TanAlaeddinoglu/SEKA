@@ -16,7 +16,7 @@ export default function CategoryTable({ data, onEdit, onDelete }) {
                 <tr key={c.id}>
                     <td>{c.categoryName}</td>
                     <td>{c.productCount}</td>
-                    <td>{c.isActive ? "Active" : "Passive"}</td>
+                    <td>{c.isActive ? "Aktif" : "Pasif"}</td>
                     <td className="category-actions">
                         <button className="edit" onClick={() => onEdit(c)}>
                             Düzenle

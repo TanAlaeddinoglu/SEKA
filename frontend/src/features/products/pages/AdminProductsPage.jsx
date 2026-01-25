@@ -5,6 +5,7 @@ import ProductTable from "../components/ProductTable";
 import ProductListControls from "../components/ProductListControls";
 import {useProducts} from "../hooks/useProducts";
 import {useDeleteProduct} from "../hooks/useDeleteProduct";
+import ConfirmModal from "../../../shared/components/ConfirmModal";
 
 import "../styles/AdminProductsPage.css";
 
@@ -16,16 +17,31 @@ export default function AdminProductsPage() {
     const [sort, setSort] = useState("productName,asc");
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
     const deleteMutation = useDeleteProduct();
 
-    const handleDelete = (id) => {
-        const ok = window.confirm(
-            "Bu ürünü silmek istediğinize emin misiniz?"
-        );
-        if (!ok) return;
+    const openDeleteModal = (id) => {
+        setDeleteTarget(id);
+        setDeleteModalOpen(true);
+    };
 
-        deleteMutation.mutate(id);
+    const closeDeleteModal = () => {
+        if (deleteMutation.isLoading) return;
+        setDeleteModalOpen(false);
+        setDeleteTarget(null);
+    };
+
+    const confirmDelete = () => {
+        if (!deleteTarget) return;
+
+        deleteMutation.mutate(deleteTarget, {
+            onSettled: () => {
+                setDeleteModalOpen(false);
+                setDeleteTarget(null);
+            },
+        });
     };
 
     useEffect(() => {
@@ -85,7 +101,7 @@ export default function AdminProductsPage() {
                     onEdit={(p) =>
                         navigate(`/admin/products/${p.id}`)
                     }
-                    onDelete={(id) => handleDelete(id)}
+                    onDelete={(id) => openDeleteModal(id)}
                 />
             )}
 
@@ -111,6 +127,19 @@ export default function AdminProductsPage() {
                     Sonraki
                 </button>
             </div>
+
+            <ConfirmModal
+                open={deleteModalOpen}
+                title="Ürün Sil"
+                message="Bu ürünü silmek istediğinize emin misiniz?"
+                confirmText="Sil"
+                cancelText="İptal"
+                loadingText="Siliniyor..."
+                onConfirm={confirmDelete}
+                onCancel={closeDeleteModal}
+                loading={deleteMutation.isLoading}
+                danger
+            />
         </div>
     );
 }

@@ -13,6 +13,6 @@ export function useCategories() {
 export function normalizeCategory(raw) {
     return {
         ...raw,
-        isActive: raw.active,
+        isActive: raw.isActive ?? raw.active ?? false,
     };
 }
