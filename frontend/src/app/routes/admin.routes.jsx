@@ -1,13 +1,30 @@
+import { lazy, Suspense } from "react";
 import { Route } from "react-router-dom";
 import RequireAuth from "./RequireAuth";
 import RequireAdmin from "./RequireAdmin";
 import AdminLayout from "../../layouts/AdminLayout";
 
-import AdminCategoriesPage from "../../features/categories/pages/AdminCategoriesPage.jsx";
-import AdminProductsPage from "../../features/products/pages/AdminProductsPage.jsx";
-import AdminProductEditPage from "../../features/products/pages/AdminProductEditPage.jsx";
-import AdminProductCreatePage from "../../features/products/pages/AdminProductCreatePage.jsx";
-import AdminUsersPage from "../../features/users/pages/AdminUsersPage.jsx";
+const AdminCategoriesPage = lazy(() =>
+    import("../../features/categories/pages/AdminCategoriesPage.jsx")
+);
+const AdminProductsPage = lazy(() =>
+    import("../../features/products/pages/AdminProductsPage.jsx")
+);
+const AdminProductEditPage = lazy(() =>
+    import("../../features/products/pages/AdminProductEditPage.jsx")
+);
+const AdminProductCreatePage = lazy(() =>
+    import("../../features/products/pages/AdminProductCreatePage.jsx")
+);
+const AdminUsersPage = lazy(() =>
+    import("../../features/users/pages/AdminUsersPage.jsx")
+);
+
+const withSuspense = (element) => (
+    <Suspense fallback={<div style={{ padding: "24px 20px" }}>Yükleniyor...</div>}>
+        {element}
+    </Suspense>
+);
 
 export const adminRoutes = (
     <Route
@@ -20,17 +37,20 @@ export const adminRoutes = (
             </RequireAuth>
         }
     >
-        <Route index element={<div>Admin Dashboard</div>} />
+        <Route index element={withSuspense(<div>Admin Dashboard</div>)} />
 
         {/* USERS */}
-        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="users" element={withSuspense(<AdminUsersPage />)} />
 
         {/* CATEGORIES */}
-        <Route path="categories" element={<AdminCategoriesPage />} />
+        <Route path="categories" element={withSuspense(<AdminCategoriesPage />)} />
 
         {/* PRODUCTS */}
-        <Route path="products" element={<AdminProductsPage />} />
-        <Route path="products/new" element={<AdminProductCreatePage />} />
-        <Route path="products/:id/edit" element={<AdminProductEditPage />} />
+        <Route path="products" element={withSuspense(<AdminProductsPage />)} />
+        <Route path="products/new" element={withSuspense(<AdminProductCreatePage />)} />
+        <Route
+            path="products/:id/edit"
+            element={withSuspense(<AdminProductEditPage />)}
+        />
     </Route>
 );

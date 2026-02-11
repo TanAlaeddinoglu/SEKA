@@ -1,0 +1,70 @@
+.product-filters {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.filter-search input,
+.filter-group select {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: var(--font-main);
+    background: var(--color-bg);
+}
+
+.filter-group select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--color-primary) 50%),
+        linear-gradient(135deg, var(--color-primary) 50%, transparent 50%);
+    background-position: calc(100% - 18px) calc(50% - 3px),
+        calc(100% - 12px) calc(50% - 3px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(57, 43, 146, 0.12);
+}
+
+.sort-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.sort-buttons button {
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: var(--font-display);
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.sort-buttons button.active,
+.sort-buttons button:hover {
+    background: var(--color-hover);
+    border-color: var(--color-primary);
+}
+
+@media (max-width: 900px) {
+    .product-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .sort-buttons {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}

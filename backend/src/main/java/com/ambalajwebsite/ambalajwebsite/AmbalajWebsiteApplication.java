@@ -1,11 +1,17 @@
 package com.ambalajwebsite.ambalajwebsite;
 
-import com.ambalajwebsite.ambalajwebsite.model.User;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.ambalajwebsite.ambalajwebsite.config.PasswordEncoderConfig;
+import com.ambalajwebsite.ambalajwebsite.model.Role;
+import com.ambalajwebsite.ambalajwebsite.model.User;
 import com.ambalajwebsite.ambalajwebsite.repository.CategoryRepository;
 import com.ambalajwebsite.ambalajwebsite.repository.ProductFeatureRepository;
 import com.ambalajwebsite.ambalajwebsite.repository.ProductRepository;
@@ -16,11 +22,31 @@ import jakarta.transaction.Transactional;
 @SpringBootApplication
 public class AmbalajWebsiteApplication implements CommandLineRunner {
 
+    private static final Logger logger = LoggerFactory.getLogger(AmbalajWebsiteApplication.class);
+
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ProductFeatureRepository productFeatureRepository;
     private final UserRepository userRepository;
     private final PasswordEncoderConfig passwordEncoder;
+
+    @Value("${app.bootstrap-admin.enabled:true}")
+    private boolean bootstrapAdminEnabled;
+
+    @Value("${app.bootstrap-admin.username:admin}")
+    private String bootstrapAdminUsername;
+
+    @Value("${app.bootstrap-admin.password:Admin123!}")
+    private String bootstrapAdminPassword;
+
+    @Value("${app.bootstrap-admin.email:admin@example.com}")
+    private String bootstrapAdminEmail;
+
+    @Value("${app.bootstrap-admin.name:Admin}")
+    private String bootstrapAdminName;
+
+    @Value("${app.bootstrap-admin.surname:Admin}")
+    private String bootstrapAdminSurname;
 
     public AmbalajWebsiteApplication(CategoryRepository categoryRepository, ProductRepository productRepository, ProductFeatureRepository productFeatureRepository, UserRepository userRepository, PasswordEncoderConfig passwordEncoder) {
         this.categoryRepository = categoryRepository;
@@ -38,72 +64,21 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-//         User user = User.builder()
-//                 .name("Admin")
-//                 .surname("Admin")
-//                 .username("admin")
-//                 .password(passwordEncoder.encode("123456"))
-//                 .email("admin@example.com")
-//                 .accountNonExpired(true)
-//                 .isEnabled(true)
-//                 .accountNonLocked(true)
-//                 .credentialsNonExpired(true)
-//                 .authorities(Set.of(ROLE_ADMIN))
-//                 .build();
-//         User savedUser = userRepository.save(user);
-
-//        Category category = Category.builder()
-//                .categoryName("Kategori-2")
-//                .slug("Kategori-2")
-//                .build();
-//
-//        Category c1 = categoryRepository.save(category);
-//
-//        List<Product> productList = new ArrayList<>();
-//        productList.add(Product.builder()
-//                        .productName("Urun-1")
-//                        .category(c1)
-//                        .brand("tan").slug("urun-1")
-//                        .build());
-//        productList.add(Product.builder()
-//                .productName("Urun-2")
-//                .category(c1)
-//                .brand("tan").slug("urun-2")
-//                .build());
-//
-//        List<Product> a = productRepository.saveAll(productList);
-//
-//        List<Category> categories = categoryRepository.findAll();
-//        List<Product> products = productRepository.findAll();
-//
-//        System.out.println(categories);
-//        System.out.println(products);
-//
-//        Category category = Category.builder()
-//                .categoryName("Kategori-4")
-//                .slug("Kategori-4")
-//                .build();
-//
-//        Category c2 = categoryRepository.save(category);
-//
-//        Product p1 = Product.builder()
-//                        .productName("Urun-4")
-//                        .brand("tan").slug("urun-4")
-//                        .category(c2)
-//                        .build();
-//        Product p = productRepository.save(p1);
-//
-//
-//        ProductFeature feature = ProductFeature.builder()
-//                .unit(UnitType.PIECE)
-//                .packPerCarton(5)
-//                .unitPerPack(4)
-//                .color("mavi")
-//                .size("25cm x 14cm")
-//                .weight("25kg")
-//                .product(p1)
-//                .build();
-//
-//        ProductFeature f1 = productFeatureRepository.save(feature);
+        if (bootstrapAdminEnabled && userRepository.count() == 0) {
+            User user = User.builder()
+                    .name(bootstrapAdminName)
+                    .surname(bootstrapAdminSurname)
+                    .username(bootstrapAdminUsername)
+                    .password(passwordEncoder.encode(bootstrapAdminPassword))
+                    .email(bootstrapAdminEmail)
+                    .accountNonExpired(true)
+                    .isEnabled(true)
+                    .accountNonLocked(true)
+                    .credentialsNonExpired(true)
+                    .authorities(Set.of(Role.ROLE_ADMIN))
+                    .build();
+            userRepository.save(user);
+            logger.warn("Bootstrapped initial admin user '{}'. Change the password after first login.", bootstrapAdminUsername);
+        }
     }
 }

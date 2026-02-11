@@ -1,26 +1,85 @@
-version: '3.8'
+version: "3.9"
 
 services:
   db:
-    image: postgres:15
-    restart: always
-    container_name: ambalaj-db
+    image: postgres:16-alpine
+    container_name: amb_local_db
     environment:
-      POSTGRES_DB: ambalaj_db
-      POSTGRES_USER: crm_user
-      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks: [ambnet]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crm_user -d ambalaj_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2024-03-07T00-43-48Z
-    container_name: ambalaj-minio
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: amb_local_minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: qWuAfozeQourCLTlXe1C
-      MINIO_ROOT_PASSWORD: YNIk8DfItbGOvO3AHAVv6XSTyGhV0OSA2hu31hdW
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_SERVER_URL: ${MINIO_ENDPOINT}
+
     ports:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - ./minio-data:/data
+      - minio-data:/data
+    networks: [ambnet]
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: amb_local_backend
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+
+      # ✅ DB (container içinden)
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # ✅ MinIO internal endpoint (container -> minio)
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+
+      # ✅ Browser'a dönecek endpoint (public)
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT}
+
+      MINIO_URL_EXPIRY_SECONDS: 3600
+    ports:
+      - "8080:8080"
+    networks: [ambnet]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: amb_local_frontend
+    depends_on: [backend]
+    ports:
+      - "5173:80"
+    networks: [ambnet]
+
+networks:
+  ambnet:
+
+volumes:
+  minio-data:
+  postgres-data:

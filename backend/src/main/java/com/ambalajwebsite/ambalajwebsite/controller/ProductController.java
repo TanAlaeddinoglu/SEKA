@@ -36,8 +36,9 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<ProductDto>> getAllProducts(
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) String categoryName,
              Pageable pageable) {
-        return ResponseEntity.ok(productService.getAllProducts(search, pageable));
+        return ResponseEntity.ok(productService.getAllProducts(search, categoryName, pageable));
     }
 
     @GetMapping("/{id}")

@@ -32,6 +32,9 @@ frontend/src/test/
 *.ipr
 *.iws
 
+# Root env (Docker Compose)
+.env
+
 .DS_Store
 Thumbs.db
 

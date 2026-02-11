@@ -133,7 +133,7 @@ export default function AdminUsersPage() {
                 title="Kullanici Sil"
                 message="Kullaniciyi Silmek IStiyormusunuz?"
                 confirmText="Sil"
-                cancelText="Iptal"
+                cancelText="İptal"
                 loadingText="Siliniyor..."
                 onConfirm={confirmDelete}
                 onCancel={closeDeleteModal}

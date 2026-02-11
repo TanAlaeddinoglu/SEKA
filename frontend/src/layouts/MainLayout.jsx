@@ -1,11 +1,15 @@
 import { Outlet } from "react-router-dom";
+import Header from "../shared/components/header/Header";
+import Footer from "../shared/components/footer/Footer";
+import Breadcrumbs from "../shared/components/breadcrumbs/Breadcrumbs";
 
 export default function MainLayout() {
     return (
         <>
-            <header>Header</header>
+            <Header />
+            <Breadcrumbs />
             <Outlet />
-            <footer>Footer</footer>
+            <Footer />
         </>
     );
 }

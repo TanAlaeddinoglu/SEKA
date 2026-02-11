@@ -63,8 +63,9 @@ public class ProductService {
         return productDtoConverter.convert(product);
     }
 
-    public Page<ProductDto> getAllProducts(String search, Pageable pageable) {
-        Specification<Product> specification = ProductSpecification.search(search);
+    public Page<ProductDto> getAllProducts(String search, String categoryName, Pageable pageable) {
+        Specification<Product> specification = ProductSpecification.search(search)
+                .and(ProductSpecification.hasCategoryName(categoryName));
         return productRepository.findAll(specification, pageable)
                 .map(productDtoConverter::convert);
     }
