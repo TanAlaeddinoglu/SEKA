@@ -7,8 +7,6 @@ import com.ambalajwebsite.ambalajwebsite.service.ProductImageService;
 import com.ambalajwebsite.ambalajwebsite.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

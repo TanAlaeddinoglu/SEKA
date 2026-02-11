@@ -12,9 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.ambalajwebsite.ambalajwebsite.config.PasswordEncoderConfig;
 import com.ambalajwebsite.ambalajwebsite.model.Role;
 import com.ambalajwebsite.ambalajwebsite.model.User;
-import com.ambalajwebsite.ambalajwebsite.repository.CategoryRepository;
-import com.ambalajwebsite.ambalajwebsite.repository.ProductFeatureRepository;
-import com.ambalajwebsite.ambalajwebsite.repository.ProductRepository;
 import com.ambalajwebsite.ambalajwebsite.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -24,9 +21,6 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(AmbalajWebsiteApplication.class);
 
-    private final CategoryRepository categoryRepository;
-    private final ProductRepository productRepository;
-    private final ProductFeatureRepository productFeatureRepository;
     private final UserRepository userRepository;
     private final PasswordEncoderConfig passwordEncoder;
 
@@ -48,10 +42,8 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     @Value("${app.bootstrap-admin.surname:Admin}")
     private String bootstrapAdminSurname;
 
-    public AmbalajWebsiteApplication(CategoryRepository categoryRepository, ProductRepository productRepository, ProductFeatureRepository productFeatureRepository, UserRepository userRepository, PasswordEncoderConfig passwordEncoder) {
-        this.categoryRepository = categoryRepository;
-        this.productRepository = productRepository;
-        this.productFeatureRepository = productFeatureRepository;
+    public AmbalajWebsiteApplication(UserRepository userRepository, PasswordEncoderConfig passwordEncoder) {
+
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
