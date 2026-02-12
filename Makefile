@@ -30,3 +30,4 @@ prod-down:
 
 prod-logs:
 	$(PROD_COMPOSE) logs -f --tail=150
+
