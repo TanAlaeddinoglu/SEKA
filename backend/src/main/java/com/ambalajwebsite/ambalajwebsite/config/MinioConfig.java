@@ -10,6 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Configuration
 public class MinioConfig {
@@ -30,6 +31,7 @@ public class MinioConfig {
 
     @Bean
     public MinioClient minioClient() {
+        log.debug("MinIO internal endpoint: {}", endpoint);
         return MinioClient.builder()
                 .endpoint(endpoint)
                 .credentials(accessKey, secretKey)
@@ -37,7 +39,21 @@ public class MinioConfig {
     }
 
     @Bean
-    public CommandLineRunner minioBucketInitializer(MinioClient client) {
+    public MinioClient minioPublicClient(
+            @Value("${minio.public-endpoint:}") String publicEndpoint
+    ) {
+        String endpointToUse = publicEndpoint == null || publicEndpoint.isBlank()
+                ? endpoint
+                : publicEndpoint;
+        log.debug("MinIO public endpoint: {}", endpointToUse);
+        return MinioClient.builder()
+                .endpoint(endpointToUse)
+                .credentials(accessKey, secretKey)
+                .build();
+    }
+
+    @Bean
+    public CommandLineRunner minioBucketInitializer(@Qualifier("minioClient") MinioClient client) {
         return args -> {
             try {
                 boolean exists = client.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());

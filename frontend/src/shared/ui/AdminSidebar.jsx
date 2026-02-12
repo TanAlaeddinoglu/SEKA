@@ -22,6 +22,9 @@ export default function AdminSidebar({ open, onClose }) {
                     <NavLink to="/admin/users" className="sidebar-link" onClick={onClose}>
                         Kullanıcılar
                     </NavLink>
+                    <NavLink to="/">
+                        Siteye Git
+                    </NavLink>
                 </nav>
             </aside>
         </>

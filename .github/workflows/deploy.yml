@@ -1,0 +1,234 @@
+name: CI and Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE_NAME: ambalaj-backend
+  FRONTEND_IMAGE_NAME: ambalaj-frontend
+
+jobs:
+  ci:
+    name: Build Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Backend compile
+        working-directory: backend
+        run: ./mvnw -B -DskipTests compile
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Frontend build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Validate compose files
+        run: |
+          docker compose --env-file .env.local.example -f docker-compose.yml config >/dev/null
+          docker compose --env-file .env.prod.example -f docker-compose.prod.yml config >/dev/null
+
+  build_and_push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    needs:
+      - ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Backend image metadata
+        id: backend_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.BACKEND_IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ github.sha }}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          target: runtime-prod
+          push: true
+          tags: ${{ steps.backend_meta.outputs.tags }}
+          labels: ${{ steps.backend_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Frontend image metadata
+        id: frontend_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ github.sha }}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          target: runtime-prod
+          push: true
+          build-args: |
+            VITE_API_BASE_URL=/
+          tags: ${{ steps.frontend_meta.outputs.tags }}
+          labels: ${{ steps.frontend_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  pre_deploy_verification:
+    name: Pre-deploy Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - build_and_push
+    env:
+      IMAGE_TAG: ${{ github.sha }}
+      BACKEND_IMAGE: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.BACKEND_IMAGE_NAME }}
+      FRONTEND_IMAGE: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE_NAME }}
+      GATEWAY_PORT: "18080"
+      DB_DATA_PATH: ${{ github.workspace }}/.ci-data/postgres
+      MINIO_DATA_PATH: ${{ github.workspace }}/.ci-data/minio
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create CI env file for prod compose
+        run: |
+          mkdir -p "$DB_DATA_PATH" "$MINIO_DATA_PATH"
+          cat > .env.ci <<EOF
+          BACKEND_IMAGE=${BACKEND_IMAGE}
+          FRONTEND_IMAGE=${FRONTEND_IMAGE}
+          IMAGE_TAG=${IMAGE_TAG}
+          GATEWAY_PORT=${GATEWAY_PORT}
+          DB_PORT=5432
+          DB_DATA_PATH=${DB_DATA_PATH}
+          MINIO_DATA_PATH=${MINIO_DATA_PATH}
+          POSTGRES_DB=ambalaj_ci
+          POSTGRES_USER=ambalaj_ci
+          POSTGRES_PASSWORD=ambalaj_ci_password
+          MINIO_ROOT_USER=minioadmin
+          MINIO_ROOT_PASSWORD=minioadmin123
+          MINIO_ACCESS_KEY=minioadmin
+          MINIO_SECRET_KEY=minioadmin123
+          MINIO_BUCKET=product-images
+          MINIO_URL_EXPIRY_SECONDS=3600
+          MINIO_SERVER_URL=https://media.sekaticaret.test
+          MINIO_BROWSER_REDIRECT_URL=https://console.sekaticaret.test
+          MINIO_PUBLIC_ENDPOINT=https://media.sekaticaret.test
+          JWT_KEY=ci-jwt-key-please-replace-for-real-env
+          APP_CORS_ALLOWED_ORIGINS=https://sekaticaret.test
+          APP_BOOTSTRAP_ADMIN_ENABLED=false
+          SPRING_JPA_HIBERNATE_DDL_AUTO=update
+          EOF
+
+      - name: Pull and start production stack
+        run: |
+          docker compose --env-file .env.ci -f docker-compose.prod.yml pull
+          docker compose --env-file .env.ci -f docker-compose.prod.yml up -d --wait --wait-timeout 240
+
+      - name: Smoke test production routing
+        run: |
+          curl -fsS "http://127.0.0.1:${GATEWAY_PORT}/healthz" >/dev/null
+          curl -fsS -H "Host: sekaticaret.com.tr" "http://127.0.0.1:${GATEWAY_PORT}/" | grep -qi "<!doctype html"
+          curl -fsS -H "Host: media.sekaticaret.com.tr" "http://127.0.0.1:${GATEWAY_PORT}/minio/health/live" >/dev/null
+          docker compose --env-file .env.ci -f docker-compose.prod.yml exec -T backend sh -c "curl -fsS http://127.0.0.1:8080/actuator/health/readiness | grep -q '\"status\":\"UP\"'"
+
+      - name: Debug logs on failure
+        if: failure()
+        run: |
+          docker compose --env-file .env.ci -f docker-compose.prod.yml ps
+          docker compose --env-file .env.ci -f docker-compose.prod.yml logs --no-color --tail=200
+
+      - name: Teardown verification stack
+        if: always()
+        run: docker compose --env-file .env.ci -f docker-compose.prod.yml down -v --remove-orphans
+
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs:
+      - pre_deploy_verification
+    environment:
+      name: production
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          envs: IMAGE_TAG,GHCR_USERNAME,GHCR_TOKEN
+          script: |
+            set -euo pipefail
+
+            cd /opt/apps/sekaticaret
+            git fetch --prune origin
+            git checkout main
+            git pull --ff-only origin main
+
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+
+            IMAGE_TAG="$IMAGE_TAG" docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+            IMAGE_TAG="$IMAGE_TAG" docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --remove-orphans
+
+            docker image prune -f

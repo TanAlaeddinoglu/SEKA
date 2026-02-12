@@ -18,4 +18,16 @@ public final class  ProductSpecification {
             );
         };
     }
+
+    public static Specification<Product> hasCategoryName(String categoryName) {
+        return (root, query, criteriaBuilder) -> {
+            if (categoryName == null || categoryName.isBlank()) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(
+                    criteriaBuilder.lower(root.get("category").get("categoryName")),
+                    categoryName.toLowerCase()
+            );
+        };
+    }
 }

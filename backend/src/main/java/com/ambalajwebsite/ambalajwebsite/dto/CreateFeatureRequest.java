@@ -1,6 +1,7 @@
 package com.ambalajwebsite.ambalajwebsite.dto;
 
 import com.ambalajwebsite.ambalajwebsite.model.UnitType;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +22,6 @@ public class CreateFeatureRequest {
     @NotNull(message = "unitPerPack is required")
     private Integer unitPerPack;
 
-    @NotNull(message = "unitPerCarton is required")
     private Integer unitPerCarton;
 
     private String color;

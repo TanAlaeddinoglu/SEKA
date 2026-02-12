@@ -70,12 +70,23 @@ public class ProductImageService {
 
         return savedImages.stream().map(productImageDtoConverter::convert).toList();
     }
-
     public List<ProductImageDto> getImages(Long productId) {
         return productImageRepository.findAllByProductIdAndIsActiveTrue(productId).stream()
-                .map(productImageDtoConverter::convert)
+                .map(img -> {
+                    ProductImageDto dto = productImageDtoConverter.convert(img);
+                    try {
+                        dto.setUrl(storageService.presign(img.getObjectKey())); // dto mutable ise
+                    } catch (Exception ignored) {}
+                    return dto;
+                })
                 .toList();
     }
+
+//    public List<ProductImageDto> getImages(Long productId) {
+//        return productImageRepository.findAllByProductIdAndIsActiveTrue(productId).stream()
+//                .map(productImageDtoConverter::convert)
+//                .toList();
+//    }
 
     public void setCover(Long productId, Long imageId) {
         Product product = productRepository.findById(productId).orElseThrow();

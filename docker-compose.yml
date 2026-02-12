@@ -1,26 +1,120 @@
-version: '3.8'
+name: sekaticaret-local
+
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+  networks:
+    - ambnet
 
 services:
   db:
-    image: postgres:15
-    restart: always
-    container_name: ambalaj-db
+    <<: *service-defaults
+    image: postgres:16-alpine
     environment:
-      POSTGRES_DB: ambalaj_db
-      POSTGRES_USER: crm_user
-      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2024-03-07T00-43-48Z
-    container_name: ambalaj-minio
+    <<: *service-defaults
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: qWuAfozeQourCLTlXe1C
-      MINIO_ROOT_PASSWORD: YNIk8DfItbGOvO3AHAVv6XSTyGhV0OSA2hu31hdW
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_SERVER_URL: ${MINIO_SERVER_URL}
     ports:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - ./minio-data:/data
+      - minio-data:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:9000/minio/health/live >/dev/null || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  backend:
+    <<: *service-defaults
+    image: ambalaj-backend:local
+    pull_policy: never
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runtime-local
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      # Local dev: backend always authenticates with MinIO root credentials.
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_ENDPOINT: ${MINIO_SERVER_URL}
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT}
+      MINIO_URL_EXPIRY_SECONDS: ${MINIO_URL_EXPIRY_SECONDS}
+
+      JWT_KEY: ${JWT_KEY}
+
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS}
+      APP_BOOTSTRAP_ADMIN_ENABLED: ${APP_BOOTSTRAP_ADMIN_ENABLED}
+      APP_BOOTSTRAP_ADMIN_USERNAME: ${APP_BOOTSTRAP_ADMIN_USERNAME}
+      APP_BOOTSTRAP_ADMIN_PASSWORD: ${APP_BOOTSTRAP_ADMIN_PASSWORD}
+      APP_BOOTSTRAP_ADMIN_EMAIL: ${APP_BOOTSTRAP_ADMIN_EMAIL}
+      APP_BOOTSTRAP_ADMIN_NAME: ${APP_BOOTSTRAP_ADMIN_NAME}
+      APP_BOOTSTRAP_ADMIN_SURNAME: ${APP_BOOTSTRAP_ADMIN_SURNAME}
+      APP_BOOTSTRAP_ADMIN_RESET_PASSWORD_ON_STARTUP: ${APP_BOOTSTRAP_ADMIN_RESET_PASSWORD_ON_STARTUP}
+      JAVA_OPTS: ${JAVA_OPTS}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8080/actuator/health/readiness | grep -q '\"status\":\"UP\"'" ]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  frontend:
+    <<: *service-defaults
+    image: ambalaj-frontend:local
+    pull_policy: never
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:80"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+networks:
+  ambnet:
+
+volumes:
+  minio-data:
+  postgres-data:

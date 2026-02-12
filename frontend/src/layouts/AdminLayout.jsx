@@ -2,14 +2,20 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import AdminSidebar from "../shared/ui/AdminSidebar";
 import AdminTopbar from "../shared/ui/AdminTopbar";
+import { useAuth } from "../app/providers/AuthProvider";
 import "./AdminLayout.css";
 
 export default function AdminLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
+    const auth = useAuth();
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
+        if (auth?.setToken) {
+            auth.setToken(null);
+        } else {
+            localStorage.removeItem("token");
+        }
         navigate("/login", { replace: true });
     };
 

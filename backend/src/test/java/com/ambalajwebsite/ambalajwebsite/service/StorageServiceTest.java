@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,8 +24,16 @@ class StorageServiceTest {
 
     @Test
     void upload_callsPutObject() throws Exception {
-        StorageService service = new StorageService(minioClient, "bucket", 3600);
-        MockMultipartFile file = new MockMultipartFile("file", "a.png", "image/png", "data".getBytes());
+        StorageService service = new StorageService(
+                minioClient,
+                "bucket",
+                3600,
+                "http://localhost:9000"
+        );
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "a.png", "image/png", "data".getBytes()
+        );
 
         service.upload("obj-key", file);
 
@@ -36,23 +45,37 @@ class StorageServiceTest {
 
     @Test
     void delete_callsRemoveObject() throws Exception {
-        StorageService service = new StorageService(minioClient, "bucket", 3600);
+        StorageService service = new StorageService(
+                minioClient,
+                "bucket",
+                3600,
+                "http://localhost:9000"
+        );
 
         service.delete("obj-key");
 
         ArgumentCaptor<RemoveObjectArgs> captor = ArgumentCaptor.forClass(RemoveObjectArgs.class);
         verify(minioClient).removeObject(captor.capture());
         assertEquals("bucket", captor.getValue().bucket());
+        assertEquals("obj-key", captor.getValue().object());
     }
 
     @Test
-    void presign_returnsUrl() throws Exception {
-        StorageService service = new StorageService(minioClient, "bucket", 3600);
-        when(minioClient.getPresignedObjectUrl(org.mockito.ArgumentMatchers.any(GetPresignedObjectUrlArgs.class)))
-                .thenReturn("url");
+    void presign_rewritesHostToPublicEndpoint() throws Exception {
+        StorageService service = new StorageService(
+                minioClient,
+                "bucket",
+                3600,
+                "http://localhost:9000"
+        );
+
+        // MinIO internal presigned URL (container-side host)
+        when(minioClient.getPresignedObjectUrl(any(GetPresignedObjectUrlArgs.class)))
+                .thenReturn("http://minio:9000/bucket/obj-key?X-Amz-Signature=abc");
 
         String result = service.presign("obj-key");
 
-        assertEquals("url", result);
+        // Expect rewritten to public endpoint
+        assertEquals("http://localhost:9000/bucket/obj-key?X-Amz-Signature=abc", result);
     }
 }

@@ -2,8 +2,13 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { parseApiError } from "../utils/errorParser";
 
+const apiBaseUrl =
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    "";
+
 export const httpClient = axios.create({
-    baseURL: "http://localhost:8080",
+    baseURL: apiBaseUrl,
 });
 
 httpClient.interceptors.request.use((config) => {
@@ -17,7 +22,6 @@ httpClient.interceptors.request.use((config) => {
 httpClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        console.log("🔥 INTERCEPTOR ERROR:", error.response?.data);
         const message = parseApiError(error);
         toast.error(message);
         return Promise.reject(error);

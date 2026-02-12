@@ -8,7 +8,8 @@
     --color-primary: #2563eb;
 
     /* Typography */
-    --font-main: system-ui, -apple-system, BlinkMacSystemFont;
+    --font-main: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-display: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
     /* Spacing */
     --space-xs: 4px;
@@ -19,4 +20,17 @@
     /* Layout */
     --sidebar-width: 240px;
     --topbar-height: 56px;
+    --header-height: 92px;
+
+    --color-primary: #392b92;
+    --color-primary-dark: #301e9f;
+    --color-muted: #5f5f5f;
+
+    --color-bg: #ffffff;
+    --color-border: rgba(0,0,0,0.06);
+    --color-hover: rgba(57,43,146,0.08);
+    --color-logo-green:#52a167
+    
+
+
 }

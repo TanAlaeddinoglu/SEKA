@@ -1,0 +1,164 @@
+.product-card-public {
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-card-public:hover {
+    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.product-card-media {
+    width: 100%;
+    height: 180px;
+    aspect-ratio: 16 / 9;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 900px) {
+    .product-card-media {
+        height: 160px;
+        aspect-ratio: 16 / 9;
+    }
+
+    .product-card-body {
+        padding: 14px;
+        grid-template-rows: auto auto;
+    }
+
+    .product-card-body h3 {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 600px) {
+    .product-card-media {
+        height: 140px;
+        aspect-ratio: 16 / 9;
+    }
+
+    .product-card-body {
+        padding: 12px;
+        gap: 6px;
+    }
+
+    .product-card-overlay .material-symbols-outlined {
+        font-size: 28px;
+        padding: 6px;
+    }
+}
+.product-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-card-placeholder {
+    color: var(--color-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.product-card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.product-card-overlay .material-symbols-outlined {
+    font-size: 32px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.product-card-public:hover .product-card-overlay {
+    opacity: 1;
+}
+
+.product-card-body {
+    padding: 16px;
+    display: grid;
+    gap: 8px;
+    grid-template-rows: auto auto;
+}
+
+.product-card-title {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 8px;
+    row-gap: 6px;
+    align-items: baseline;
+}
+
+.product-card-body h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--color-primary-dark);
+    text-transform: none;
+    grid-column: 1 / 2;
+}
+
+.product-card-brand {
+    font-size: 12px;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    justify-self: end;
+    grid-column: 2 / 3;
+}
+
+.product-card-size {
+    font-size: 12px;
+    color: var(--color-muted);
+    margin-left: 0;
+    white-space: normal;
+    display: grid;
+    justify-items: start;
+    gap: 2px;
+    grid-column: 1 / -1;
+}
+
+.product-card-size-sub {
+    font-size: 11px;
+    color: var(--color-muted);
+}
+
+.product-card-body p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.product-card-body p.muted {
+    color: var(--color-muted);
+}
