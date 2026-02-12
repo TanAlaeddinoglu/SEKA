@@ -129,8 +129,7 @@ jobs:
       - build_and_push
     env:
       IMAGE_TAG: ${{ github.sha }}
-      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/ambalaj-backend
-      FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/ambalaj-frontend
+      REPO_OWNER: ${{ github.repository_owner }}
       GATEWAY_PORT: "18080"
       DB_DATA_PATH: ${{ github.workspace }}/.ci-data/postgres
       MINIO_DATA_PATH: ${{ github.workspace }}/.ci-data/minio
@@ -148,10 +147,13 @@ jobs:
 
       - name: Create CI env file for prod compose
         run: |
+          owner_lc="$(echo "$REPO_OWNER" | tr '[:upper:]' '[:lower:]')"
+          backend_image="ghcr.io/${owner_lc}/ambalaj-backend"
+          frontend_image="ghcr.io/${owner_lc}/ambalaj-frontend"
           mkdir -p "$DB_DATA_PATH" "$MINIO_DATA_PATH"
           cat > .env.ci <<EOF
-          BACKEND_IMAGE=${BACKEND_IMAGE}
-          FRONTEND_IMAGE=${FRONTEND_IMAGE}
+          BACKEND_IMAGE=${backend_image}
+          FRONTEND_IMAGE=${frontend_image}
           IMAGE_TAG=${IMAGE_TAG}
           GATEWAY_PORT=${GATEWAY_PORT}
           DB_PORT=5432
