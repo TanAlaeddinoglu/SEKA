@@ -66,7 +66,7 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
         }
 
         boolean adminExists = userRepository.findAll().stream()
-                .anyMatch(user -> user.getAuthorities() != null && user.getAuthorities().contains(Role.ROLE_ADMIN));
+                .anyMatch(user -> user.getAuthorities().contains(Role.ROLE_ADMIN));
 
         Optional<User> existingBootstrapUser = userRepository.findByUsername(bootstrapAdminUsername);
 
@@ -76,9 +76,7 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
 
         if (existingBootstrapUser.isPresent()) {
             User user = existingBootstrapUser.get();
-            Set<Role> updatedAuthorities = user.getAuthorities() == null
-                    ? new HashSet<>()
-                    : new HashSet<>(user.getAuthorities());
+            Set<Role> updatedAuthorities = new HashSet<>(user.getAuthorities());
 
             updatedAuthorities.add(Role.ROLE_ADMIN);
             user.setAuthorities(updatedAuthorities);
