@@ -1,29 +1,56 @@
-# ---- build stage ----
-FROM node:20-alpine AS build
+# syntax=docker/dockerfile:1.7
+
+############################
+# deps (cache'li)
+############################
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-ARG VITE_API_BASE_URL
+COPY package*.json ./
+
+# npm cache kullan (build sürelerini ciddi düşürür)
+RUN --mount=type=cache,target=/root/.npm \
+  npm ci
+
+############################
+# dev (local compose)
+############################
+FROM deps AS dev
+WORKDIR /app
+
+ARG VITE_API_BASE_URL=http://localhost:8080
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-COPY package*.json ./
-RUN npm ci
+COPY . .
+
+EXPOSE 80
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "80"]
+
+############################
+# build (prod bundle)
+############################
+FROM deps AS build
+WORKDIR /app
+
+# Prod’da API route'ları zaten /v1/* ile çağrılıyor.
+# Bu yüzden base URL domain root (/) olmalı.
+ARG VITE_API_BASE_URL=/
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 COPY . .
-RUN npm run build
 
-# ---- serve stage ----
-FROM nginx:alpine
+RUN --mount=type=cache,target=/root/.npm \
+  npm run build
+
+############################
+# prod runtime (nginx)
+############################
+FROM nginx:1.27-alpine AS runtime-prod
+# nginx default html’i temizle
+RUN rm -rf /usr/share/nginx/html/*
+
 COPY --from=build /app/dist /usr/share/nginx/html
-
-# SPA route fix
-RUN printf 'server {\n\
-  listen 80;\n\
-  server_name _;\n\
-  root /usr/share/nginx/html;\n\
-  index index.html;\n\
-  location / {\n\
-    try_files $uri $uri/ /index.html;\n\
-  }\n\
-}\n' > /etc/nginx/conf.d/default.conf
+# SPA + cache headers + healthz
+COPY ./nginx/frontend.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

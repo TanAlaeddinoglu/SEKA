@@ -19,6 +19,7 @@ minio-data/
 ################################
 frontend/node_modules/
 frontend/dist/
+frontend/coverage/
 frontend/.env
 frontend/.env.local
 frontend/src/test/
@@ -34,6 +35,12 @@ frontend/src/test/
 
 # Root env (Docker Compose)
 .env
+.env.prod
+.env.ci
+.env.ci.*
+
+# Local CI smoke-test artifacts
+.ci-data/
 
 .DS_Store
 Thumbs.db

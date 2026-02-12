@@ -1,5 +1,7 @@
 package com.ambalajwebsite.ambalajwebsite;
 
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -42,6 +44,9 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     @Value("${app.bootstrap-admin.surname:Admin}")
     private String bootstrapAdminSurname;
 
+    @Value("${app.bootstrap-admin.reset-password-on-startup:false}")
+    private boolean bootstrapAdminResetPasswordOnStartup;
+
     public AmbalajWebsiteApplication(UserRepository userRepository, PasswordEncoderConfig passwordEncoder) {
 
         this.userRepository = userRepository;
@@ -56,21 +61,57 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        if (bootstrapAdminEnabled && userRepository.count() == 0) {
-            User user = User.builder()
-                    .name(bootstrapAdminName)
-                    .surname(bootstrapAdminSurname)
-                    .username(bootstrapAdminUsername)
-                    .password(passwordEncoder.encode(bootstrapAdminPassword))
-                    .email(bootstrapAdminEmail)
-                    .accountNonExpired(true)
-                    .isEnabled(true)
-                    .accountNonLocked(true)
-                    .credentialsNonExpired(true)
-                    .authorities(Set.of(Role.ROLE_ADMIN))
-                    .build();
-            userRepository.save(user);
-            logger.warn("Bootstrapped initial admin user '{}'. Change the password after first login.", bootstrapAdminUsername);
+        if (!bootstrapAdminEnabled) {
+            return;
         }
+
+        boolean adminExists = userRepository.findAll().stream()
+                .anyMatch(user -> user.getAuthorities() != null && user.getAuthorities().contains(Role.ROLE_ADMIN));
+
+        Optional<User> existingBootstrapUser = userRepository.findByUsername(bootstrapAdminUsername);
+
+        if (adminExists && !(bootstrapAdminResetPasswordOnStartup && existingBootstrapUser.isPresent())) {
+            return;
+        }
+
+        if (existingBootstrapUser.isPresent()) {
+            User user = existingBootstrapUser.get();
+            Set<Role> updatedAuthorities = user.getAuthorities() == null
+                    ? new HashSet<>()
+                    : new HashSet<>(user.getAuthorities());
+
+            updatedAuthorities.add(Role.ROLE_ADMIN);
+            user.setAuthorities(updatedAuthorities);
+            user.setAccountNonExpired(true);
+            user.setAccountNonLocked(true);
+            user.setCredentialsNonExpired(true);
+            user.setEnabled(true);
+            if (bootstrapAdminResetPasswordOnStartup) {
+                user.setPassword(passwordEncoder.encode(bootstrapAdminPassword));
+            }
+
+            userRepository.save(user);
+            if (bootstrapAdminResetPasswordOnStartup) {
+                logger.warn("Ensured admin user '{}' and reset its password from bootstrap config.", bootstrapAdminUsername);
+            } else {
+                logger.warn("Promoted existing user '{}' to admin because no admin existed.", bootstrapAdminUsername);
+            }
+            return;
+        }
+
+        User user = User.builder()
+                .name(bootstrapAdminName)
+                .surname(bootstrapAdminSurname)
+                .username(bootstrapAdminUsername)
+                .password(passwordEncoder.encode(bootstrapAdminPassword))
+                .email(bootstrapAdminEmail)
+                .accountNonExpired(true)
+                .isEnabled(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .authorities(Set.of(Role.ROLE_ADMIN))
+                .build();
+        userRepository.save(user);
+        logger.warn("Bootstrapped admin user '{}'. Change the password after first login.", bootstrapAdminUsername);
     }
 }
