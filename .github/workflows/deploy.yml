@@ -193,11 +193,25 @@ jobs:
           curl -fsS -H "Host: media.sekaticaret.com.tr" "http://127.0.0.1:${GATEWAY_PORT}/minio/health/live" >/dev/null
           docker compose --env-file .env.ci -f docker-compose.prod.yml exec -T backend sh -c "curl -fsS http://127.0.0.1:8080/actuator/health/readiness | grep -q '\"status\":\"UP\"'"
 
-      - name: Debug logs on failure
-        if: failure()
+      - name: Collect diagnostics on failure
+        if: failure() || cancelled()
         run: |
-          docker compose --env-file .env.ci -f docker-compose.prod.yml ps
-          docker compose --env-file .env.ci -f docker-compose.prod.yml logs --no-color --tail=200
+          mkdir -p .ci-logs
+          docker compose --env-file .env.ci -f docker-compose.prod.yml ps > .ci-logs/ps.txt || true
+          docker compose --env-file .env.ci -f docker-compose.prod.yml logs --no-color --tail=300 backend > .ci-logs/backend.log || true
+          docker compose --env-file .env.ci -f docker-compose.prod.yml logs --no-color --tail=300 db > .ci-logs/db.log || true
+          docker compose --env-file .env.ci -f docker-compose.prod.yml logs --no-color --tail=300 minio > .ci-logs/minio.log || true
+          docker inspect sekaticaret-prod-backend-1 > .ci-logs/backend.inspect.json || true
+          cat .ci-logs/ps.txt || true
+          tail -n 120 .ci-logs/backend.log || true
+
+      - name: Upload diagnostics artifact
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-deploy-diagnostics-${{ github.run_id }}
+          path: .ci-logs
+          if-no-files-found: ignore
 
       - name: Teardown verification stack
         if: always()
