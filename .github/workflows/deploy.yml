@@ -172,9 +172,9 @@ jobs:
           MINIO_SECRET_KEY=minioadmin
           MINIO_BUCKET=product-images
           MINIO_URL_EXPIRY_SECONDS=3600
-          MINIO_SERVER_URL=https://media.sekaticaret.test
-          MINIO_BROWSER_REDIRECT_URL=https://console.sekaticaret.test
-          MINIO_PUBLIC_ENDPOINT=https://media.sekaticaret.test
+          MINIO_SERVER_URL=http://minio:9000
+          MINIO_BROWSER_REDIRECT_URL=http://minio:9001
+          MINIO_PUBLIC_ENDPOINT=http://minio:9000
           JWT_KEY=Zj7bSZVwUZGQ11GOEpVbo0q3SecgHprPV2mI6NfEO/xnCsXzwkxLNv7XwTQGm60ZB0lRWpPwLcachGEEi3NZfQ==
           APP_CORS_ALLOWED_ORIGINS=https://sekaticaret.test
           APP_BOOTSTRAP_ADMIN_ENABLED=false
