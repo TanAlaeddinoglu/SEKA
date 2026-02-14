@@ -4,6 +4,8 @@ import ContactForm from "./ContactForm";
 
 export default function ContactSection() {
     const { contact, maps } = siteConfig;
+    const phoneHref = `tel:${contact.phone.replace(/[^\d+]/g, "")}`;
+    const emailHref = `mailto:${contact.email.trim()}`;
 
     return (
         <section className="contact-section">
@@ -15,13 +17,20 @@ export default function ContactSection() {
                     <h2>İletişim</h2>
                     <div className="contact-details">
                         <div className="contact-item">
-                            Adres: {contact.address}
+                            <span className="contact-label">Adres:</span>
+                            <span className="contact-value">{contact.address}</span>
                         </div>
                         <div className="contact-item">
-                            Telefon: {contact.phone}
+                            <span className="contact-label">Telefon:</span>
+                            <a className="contact-value contact-value-link" href={phoneHref}>
+                                {contact.phone}
+                            </a>
                         </div>
                         <div className="contact-item">
-                            E-posta: {contact.email}
+                            <span className="contact-label">E-posta:</span>
+                            <a className="contact-value contact-value-link" href={emailHref}>
+                                {contact.email}
+                            </a>
                         </div>
                     </div>
                 </div>

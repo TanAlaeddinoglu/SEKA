@@ -40,6 +40,26 @@
     font-size: 14px;
 }
 
+.contact-label {
+    display: block;
+    font-weight: 600;
+}
+
+.contact-value {
+    display: block;
+    margin-top: 2px;
+}
+
+.contact-value-link {
+    color: inherit;
+    text-decoration: none;
+    text-underline-offset: 2px;
+}
+
+.contact-value-link:hover {
+    color: var(--color-primary-dark);
+}
+
 .contact-info {
     display: grid;
     gap: 16px;
