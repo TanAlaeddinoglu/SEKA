@@ -1,3 +1,9 @@
+.category-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 .category-table {
     width: 100%;
     background: var(--color-white);
@@ -72,4 +78,10 @@
 .status-badge.inactive {
     background: #fee2e2;
     color: #991b1b;
+}
+
+@media (max-width: 767px) {
+    .category-table {
+        min-width: 560px;
+    }
 }

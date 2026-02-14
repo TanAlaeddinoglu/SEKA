@@ -65,7 +65,12 @@ export default function LoginPage() {
                     value={form.username}
                     onChange={handleChange}
                     required
-                    style={{ width: "100%", marginBottom: 12, padding: 8 }}
+                    style={{
+                        width: "100%",
+                        marginBottom: 12,
+                        padding: 8,
+                        fontSize: 16,
+                    }}
                 />
 
                 <input
@@ -75,7 +80,12 @@ export default function LoginPage() {
                     value={form.password}
                     onChange={handleChange}
                     required
-                    style={{ width: "100%", marginBottom: 16, padding: 8 }}
+                    style={{
+                        width: "100%",
+                        marginBottom: 16,
+                        padding: 8,
+                        fontSize: 16,
+                    }}
                 />
 
                 <button

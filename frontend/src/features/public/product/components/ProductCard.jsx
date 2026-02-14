@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import {NavLink, useLocation} from "react-router-dom";
 import "../styles/ProductCard.css";
 
 export default function ProductCard({ product }) {
+    const location = useLocation();
     const [imageFailed, setImageFailed] = useState(false);
     const imageUrl =
         product?.coverImage?.url ||
@@ -17,7 +18,13 @@ export default function ProductCard({ product }) {
         : "Ürün";
 
     const productId = product?.id;
-    const productLink = productId ? `/urunler/${productId}` : "/urunler";
+    const listSearch =
+        location.pathname === "/urunler" && location.search
+            ? location.search
+            : "";
+    const productLink = productId
+        ? `/urunler/${productId}${listSearch}`
+        : `/urunler${listSearch}`;
 
     return (
         <NavLink className="product-card-public" to={productLink}>
