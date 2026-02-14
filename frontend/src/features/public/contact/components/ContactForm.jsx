@@ -3,44 +3,69 @@ import "../styles/ContactForm.css";
 
 const RECAPTCHA_SCRIPT_ID = "recaptcha-v2-script";
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+let recaptchaLoadPromise = null;
 
-const loadRecaptchaScript = () =>
+const waitForRecaptchaReady = (timeoutMs = 10000) =>
     new Promise((resolve, reject) => {
-        if (typeof window === "undefined") {
-            resolve();
-            return;
-        }
-
         if (window.grecaptcha?.render) {
             resolve();
             return;
         }
 
-        const existing = document.getElementById(RECAPTCHA_SCRIPT_ID);
-        if (existing) {
-            const interval = setInterval(() => {
-                if (window.grecaptcha?.render) {
-                    clearInterval(interval);
-                    resolve();
-                }
-            }, 100);
-            setTimeout(() => {
+        const start = Date.now();
+        const interval = setInterval(() => {
+            if (window.grecaptcha?.render) {
+                clearInterval(interval);
+                resolve();
+                return;
+            }
+
+            if (Date.now() - start >= timeoutMs) {
                 clearInterval(interval);
                 reject(new Error("reCAPTCHA yüklenemedi."));
-            }, 8000);
+            }
+        }, 100);
+    });
+
+const loadRecaptchaScript = () => {
+    if (typeof window === "undefined") {
+        return Promise.resolve();
+    }
+
+    if (window.grecaptcha?.render) {
+        return Promise.resolve();
+    }
+
+    if (recaptchaLoadPromise) {
+        return recaptchaLoadPromise;
+    }
+
+    recaptchaLoadPromise = new Promise((resolve, reject) => {
+        const existing = document.getElementById(RECAPTCHA_SCRIPT_ID);
+        if (existing) {
+            waitForRecaptchaReady().then(resolve).catch(reject);
             return;
         }
 
         const script = document.createElement("script");
         script.id = RECAPTCHA_SCRIPT_ID;
-        script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+        script.src =
+            "https://www.google.com/recaptcha/api.js?render=explicit";
         script.async = true;
         script.defer = true;
-        script.onload = () => resolve();
+        script.onload = () =>
+            waitForRecaptchaReady().then(resolve).catch(reject);
         script.onerror = () =>
             reject(new Error("reCAPTCHA scripti yüklenemedi."));
         document.body.appendChild(script);
+    }).finally(() => {
+        if (!window.grecaptcha?.render) {
+            recaptchaLoadPromise = null;
+        }
     });
+
+    return recaptchaLoadPromise;
+};
 
 export default function ContactForm() {
     const recaptchaRef = useRef(null);

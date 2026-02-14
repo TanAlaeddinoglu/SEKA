@@ -13,6 +13,9 @@ const QUICK_LINKS = [
 const { contact, maps } = siteConfig;
 
 export default function Footer() {
+    const phoneHref = `tel:${contact.phone.replace(/[^\d+]/g, "")}`;
+    const emailHref = `mailto:${contact.email.trim()}`;
+
     return (
         <footer className="site-footer">
             <div className="footer-main">
@@ -40,9 +43,21 @@ export default function Footer() {
 
                 <div className="footer-contact">
                     <h4>İLETİŞİM</h4>
-                    <div className="contact-item">Adres: {contact.address}</div>
-                    <div className="contact-item">Telefon: {contact.phone}</div>
-                    <div className="contact-item">E-posta: {contact.email}</div>
+                    <div className="contact-item">
+                        <strong>Adres:</strong> {contact.address}
+                    </div>
+                    <div className="contact-item">
+                        <strong>Telefon:</strong>{" "}
+                        <a className="contact-link" href={phoneHref}>
+                            {contact.phone}
+                        </a>
+                    </div>
+                    <div className="contact-item">
+                        <strong>E-posta:</strong>{" "}
+                        <a className="contact-link" href={emailHref}>
+                            {contact.email}
+                        </a>
+                    </div>
                 </div>
 
                 <div className="footer-map">

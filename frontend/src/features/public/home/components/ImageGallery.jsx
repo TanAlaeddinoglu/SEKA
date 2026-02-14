@@ -31,6 +31,7 @@ function toTitle(value) {
 export default function ImageGallery({ slides, intervalMs = 5000 }) {
     const sectionRef = useRef(null);
     const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
+    const viewportWidthRef = useRef(null);
     const resolvedSlides = useMemo(() => {
         if (Array.isArray(slides) && slides.length) {
             return slides;
@@ -77,6 +78,54 @@ export default function ImageGallery({ slides, intervalMs = 5000 }) {
         const element = sectionRef.current;
         if (!element) return;
 
+        const readViewport = () => ({
+            height: window.visualViewport?.height || window.innerHeight,
+            width: window.visualViewport?.width || window.innerWidth,
+        });
+
+        const updateHeight = () => {
+            const {height} = readViewport();
+            const rect = element.getBoundingClientRect();
+            const available = Math.max(320, height - rect.top);
+            element.style.setProperty("--gallery-height", `${available}px`);
+        };
+
+        const handleResize = () => {
+            const {width} = readViewport();
+            if (viewportWidthRef.current === null) {
+                viewportWidthRef.current = width;
+                updateHeight();
+                return;
+            }
+
+            // Ignore mobile address-bar / scroll-induced viewport height changes.
+            if (Math.abs(width - viewportWidthRef.current) < 2) {
+                return;
+            }
+
+            viewportWidthRef.current = width;
+            updateHeight();
+        };
+
+        const {width} = readViewport();
+        viewportWidthRef.current = width;
+        updateHeight();
+
+        const rafId = window.requestAnimationFrame(updateHeight);
+        window.addEventListener("resize", handleResize);
+        window.visualViewport?.addEventListener("resize", handleResize);
+
+        return () => {
+            window.cancelAnimationFrame(rafId);
+            window.removeEventListener("resize", handleResize);
+            window.visualViewport?.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
+    useEffect(() => {
+        const element = sectionRef.current;
+        if (!element) return;
+
         const updateHeight = () => {
             const viewportHeight =
                 window.visualViewport?.height || window.innerHeight;
@@ -85,13 +134,13 @@ export default function ImageGallery({ slides, intervalMs = 5000 }) {
             element.style.setProperty("--gallery-height", `${available}px`);
         };
 
-        updateHeight();
-        window.addEventListener("resize", updateHeight);
-        window.visualViewport?.addEventListener("resize", updateHeight);
+        const orientationHandler = () => {
+            window.requestAnimationFrame(updateHeight);
+        };
+        window.addEventListener("orientationchange", orientationHandler);
 
         return () => {
-            window.removeEventListener("resize", updateHeight);
-            window.visualViewport?.removeEventListener("resize", updateHeight);
+            window.removeEventListener("orientationchange", orientationHandler);
         };
     }, []);
 
