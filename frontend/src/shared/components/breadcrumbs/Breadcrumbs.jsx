@@ -17,9 +17,15 @@ const LABEL_MAP = {
 export default function Breadcrumbs() {
     const location = useLocation();
     const segments = location.pathname.split("/").filter(Boolean);
+    const productsListSearch =
+        location.pathname.startsWith("/urunler/") && location.search
+            ? location.search
+            : "";
 
     const crumbs = segments.map((segment, index) => {
-        const to = `/${segments.slice(0, index + 1).join("/")}`;
+        const baseTo = `/${segments.slice(0, index + 1).join("/")}`;
+        const to =
+            baseTo === "/urunler" ? `${baseTo}${productsListSearch}` : baseTo;
         return {
             label: LABEL_MAP[segment] || segment,
             to,
