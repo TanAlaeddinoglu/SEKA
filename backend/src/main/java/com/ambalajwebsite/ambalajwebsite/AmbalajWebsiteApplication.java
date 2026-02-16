@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.util.StringUtils;
-
 import com.ambalajwebsite.ambalajwebsite.config.PasswordEncoderConfig;
 import com.ambalajwebsite.ambalajwebsite.model.Role;
 import com.ambalajwebsite.ambalajwebsite.model.User;
@@ -27,19 +25,19 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoderConfig passwordEncoder;
 
-    @Value("${app.bootstrap-admin.enabled:false}")
+    @Value("${app.bootstrap-admin.enabled:true}")
     private boolean bootstrapAdminEnabled;
 
-    @Value("${app.bootstrap-admin.username:}")
+    @Value("${app.bootstrap-admin.username:admin}")
     private String bootstrapAdminUsername;
 
-    @Value("${app.bootstrap-admin.password:}")
+    @Value("${app.bootstrap-admin.password:Admin123!}")
     private String bootstrapAdminPassword;
 
-    @Value("${app.bootstrap-admin.email:}")
+    @Value("${app.bootstrap-admin.email:admin@example.com}")
     private String bootstrapAdminEmail;
 
-    @Value("${app.bootstrap-admin.name:Bootstrap}")
+    @Value("${app.bootstrap-admin.name:Admin}")
     private String bootstrapAdminName;
 
     @Value("${app.bootstrap-admin.surname:Admin}")
@@ -65,7 +63,6 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
         if (!bootstrapAdminEnabled) {
             return;
         }
-        validateBootstrapAdminConfig();
 
         boolean adminExists = userRepository.findAll().stream()
                 .anyMatch(user -> user.getAuthorities().contains(Role.ROLE_ADMIN));
@@ -113,15 +110,5 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
                 .build();
         userRepository.save(user);
         logger.warn("Bootstrapped admin user '{}'. Change the password after first login.", bootstrapAdminUsername);
-    }
-
-    private void validateBootstrapAdminConfig() {
-        if (!StringUtils.hasText(bootstrapAdminUsername)
-                || !StringUtils.hasText(bootstrapAdminPassword)
-                || !StringUtils.hasText(bootstrapAdminEmail)) {
-            throw new IllegalStateException(
-                    "Bootstrap admin is enabled but required fields are missing. "
-                            + "Set APP_BOOTSTRAP_ADMIN_USERNAME, APP_BOOTSTRAP_ADMIN_PASSWORD and APP_BOOTSTRAP_ADMIN_EMAIL.");
-        }
     }
 }
