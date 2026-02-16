@@ -46,26 +46,23 @@ export default function ProductDetailGallery({
         if (total <= 1) return;
         setActiveIndex((prev) => (prev + 1) % total);
     };
+    const activeImage = normalizedImages[activeIndex] || normalizedImages[0];
 
     return (
         <div className="product-detail-gallery">
             <div className="product-detail-main">
                 <div
-                    className="product-detail-track"
-                    style={{
-                        transform: `translateX(-${activeIndex * 100}%)`,
-                    }}
+                    className="product-detail-slide"
+                    key={activeImage?.id || activeIndex}
                 >
-                    {normalizedImages.map((img) => (
-                        <div className="product-detail-slide" key={img.id}>
-                            <img
-                                src={img.url}
-                                alt={`${name} görseli`}
-                                loading="eager"
-                                decoding="async"
-                            />
-                        </div>
-                    ))}
+                    <div className="product-detail-image-frame">
+                        <img
+                            src={activeImage.url}
+                            alt={`${name} görseli`}
+                            loading="eager"
+                            decoding="async"
+                        />
+                    </div>
                 </div>
 
                 {total > 1 ? (
