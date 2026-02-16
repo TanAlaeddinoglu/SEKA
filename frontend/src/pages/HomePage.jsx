@@ -192,6 +192,17 @@ export default function HomePage() {
             addressLocality: siteConfig.contact.address,
         },
     };
+    const websiteJson = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Seka Ambalaj",
+        url: siteConfig.siteUrl,
+        potentialAction: {
+            "@type": "SearchAction",
+            target: `${siteConfig.siteUrl}/urunler?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+        },
+    };
 
     const {
         data: categories = [],
@@ -212,6 +223,7 @@ export default function HomePage() {
     return (
         <div className="home-about">
             <JsonLd data={orgJson} />
+            <JsonLd data={websiteJson} />
             <ImageGallery slides={gallerySlides} />
             <div className="home-category-strip">
                 <CategoryGrid

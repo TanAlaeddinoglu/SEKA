@@ -8,7 +8,6 @@ const LABEL_MAP = {
     kategoriler: "Kategoriler",
     urunler: "Ürünler",
     hakkimizda: "Hakkımızda",
-    referanslar: "Referanslar",
     katalog: "Katalog",
     iletisim: "İletişim",
     login: "Giriş Yap",

@@ -6,7 +6,6 @@ import "./Header.css";
 const NAV_LINKS = [
     { label: "ÜRÜNLER", to: "/urunler" },
     { label: "HAKKIMIZDA", to: "/hakkimizda" },
-    { label: "REFERANSLAR", to: "/referanslar" },
     { label: "KATALOG", to: "/katalog" },
     { label: "İLETİŞİM", to: "/iletisim" },
 ];

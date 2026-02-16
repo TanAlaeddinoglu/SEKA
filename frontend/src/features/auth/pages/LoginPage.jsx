@@ -2,8 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { useLogin } from "../hooks/useLogin";
+import usePageMeta from "../../../shared/seo/usePageMeta";
+import { siteConfig } from "../../../shared/config/siteConfig";
 
 export default function LoginPage() {
+    usePageMeta({
+        title: "Seka Ambalaj | Giriş",
+        description: "Yönetim paneli giriş sayfası.",
+        canonical: `${siteConfig.siteUrl}/login`,
+        image: `${siteConfig.siteUrl}/Seka-Logo.png`,
+        robots: "noindex, nofollow",
+    });
+
     const navigate = useNavigate();
     const loginMutation = useLogin();
 
