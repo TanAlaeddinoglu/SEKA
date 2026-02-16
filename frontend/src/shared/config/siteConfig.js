@@ -1,5 +1,5 @@
 export const siteConfig = {
-    siteUrl: import.meta.env.VITE_SITE_URL || "https://example.com",
+    siteUrl: import.meta.env.VITE_SITE_URL || "https://sekaticaret.com.tr",
     contact: {
         address: import.meta.env.VITE_CONTACT_ADDRESS || "İstanbul, Türkiye",
         phone: import.meta.env.VITE_CONTACT_PHONE || "+90 212 000 00 00",

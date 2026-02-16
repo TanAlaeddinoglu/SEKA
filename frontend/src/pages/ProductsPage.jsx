@@ -56,12 +56,20 @@ export default function ProductsPage() {
         initialState.search.trim()
     );
     const [categoryName, setCategoryName] = useState(initialState.categoryName);
+    const hasSeoFilteredState =
+        page > DEFAULT_PAGE ||
+        sort !== DEFAULT_SORT ||
+        Boolean(search.trim()) ||
+        Boolean(categoryName);
 
     usePageMeta({
         title: "Seka Ambalaj | Ürünler",
         description: "Ambalaj ürünleri ve ürün listesi.",
         canonical: `${siteConfig.siteUrl}/urunler`,
         image: `${siteConfig.siteUrl}/Seka-Logo.png`,
+        robots: hasSeoFilteredState
+            ? "noindex, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+            : undefined,
     });
 
     useEffect(() => {

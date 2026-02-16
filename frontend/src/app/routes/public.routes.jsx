@@ -8,7 +8,6 @@ const CategoriesPage = lazy(() => import("../../pages/CategoriesPage.jsx"));
 const ProductsPage = lazy(() => import("../../pages/ProductsPage.jsx"));
 const ProductDetailPage = lazy(() => import("../../pages/ProductDetailPage.jsx"));
 const AboutPage = lazy(() => import("../../pages/AboutPage.jsx"));
-const ReferencesPage = lazy(() => import("../../pages/ReferencesPage.jsx"));
 const CatalogPage = lazy(() => import("../../pages/CatalogPage.jsx"));
 const ContactPage = lazy(() => import("../../pages/ContactPage.jsx"));
 
@@ -26,7 +25,6 @@ export const publicRoutes = (
             <Route path="urunler" element={withSuspense(<ProductsPage />)} />
             <Route path="urunler/:id" element={withSuspense(<ProductDetailPage />)} />
             <Route path="hakkimizda" element={withSuspense(<AboutPage />)} />
-            <Route path="referanslar" element={withSuspense(<ReferencesPage />)} />
             <Route path="katalog" element={withSuspense(<CatalogPage />)} />
             <Route path="iletisim" element={withSuspense(<ContactPage />)} />
         </Route>
