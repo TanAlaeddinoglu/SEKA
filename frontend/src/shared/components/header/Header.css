@@ -27,7 +27,7 @@
 }
 
 .site-logo-image {
-    height: 64px;
+    height: 110px;
     width: auto;
     display: block;
 }
@@ -60,7 +60,7 @@
 
 .header-link {
     text-decoration: none;
-    font-size: 13px;
+    font-size: 15px;
     letter-spacing: 0.8px;
     font-weight: 500;
     color: var(--color-primary);
@@ -333,7 +333,7 @@
     .header-link {
         width: 100%;
         padding: 10px 8px;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .categories-trigger {
