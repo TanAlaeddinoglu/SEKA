@@ -25,25 +25,25 @@ public class AmbalajWebsiteApplication implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoderConfig passwordEncoder;
 
-    @Value("${app.bootstrap-admin.enabled:true}")
+    @Value("${app.bootstrap-admin.enabled}")
     private boolean bootstrapAdminEnabled;
 
-    @Value("${app.bootstrap-admin.username:admin}")
+    @Value("${app.bootstrap-admin.username}")
     private String bootstrapAdminUsername;
 
-    @Value("${app.bootstrap-admin.password:Admin123!}")
+    @Value("${app.bootstrap-admin.password}")
     private String bootstrapAdminPassword;
 
-    @Value("${app.bootstrap-admin.email:admin@example.com}")
+    @Value("${app.bootstrap-admin.email}")
     private String bootstrapAdminEmail;
 
-    @Value("${app.bootstrap-admin.name:Admin}")
+    @Value("${app.bootstrap-admin.name}")
     private String bootstrapAdminName;
 
-    @Value("${app.bootstrap-admin.surname:Admin}")
+    @Value("${app.bootstrap-admin.surname}")
     private String bootstrapAdminSurname;
 
-    @Value("${app.bootstrap-admin.reset-password-on-startup:false}")
+    @Value("${app.bootstrap-admin.reset-password-on-startup}")
     private boolean bootstrapAdminResetPasswordOnStartup;
 
     public AmbalajWebsiteApplication(UserRepository userRepository, PasswordEncoderConfig passwordEncoder) {
