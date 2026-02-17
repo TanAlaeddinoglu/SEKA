@@ -5,6 +5,7 @@ const AuthContext = createContext({
     isAuthenticated: false,
     roles: [],
     isAdmin: false,
+    expiresAt: null,
     setToken: () => {},
 });
 
@@ -23,19 +24,35 @@ export function AuthProvider({ children }) {
     };
 
     const auth = useMemo(() => {
-        if (!token) return { isAuthenticated: false };
+        if (!token) {
+            return {
+                isAuthenticated: false,
+                roles: [],
+                isAdmin: false,
+                expiresAt: null,
+            };
+        }
 
         try {
             const decoded = jwtDecode(token);
             const roles = decoded.roles || [];
+            const expiresAt =
+                typeof decoded.exp === "number" ? decoded.exp * 1000 : null;
+            const isExpired = typeof expiresAt === "number" && expiresAt <= Date.now();
 
             return {
-                isAuthenticated: true,
-                roles,
-                isAdmin: roles.includes("ROLE_ADMIN"),
+                isAuthenticated: !isExpired,
+                roles: isExpired ? [] : roles,
+                isAdmin: !isExpired && roles.includes("ROLE_ADMIN"),
+                expiresAt,
             };
         } catch {
-            return { isAuthenticated: false };
+            return {
+                isAuthenticated: false,
+                roles: [],
+                isAdmin: false,
+                expiresAt: null,
+            };
         }
     }, [token]);
 

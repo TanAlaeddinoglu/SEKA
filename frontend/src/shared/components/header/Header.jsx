@@ -102,7 +102,7 @@ export default function Header() {
             <div className="header-inner">
                 <NavLink to="/" className="site-logo" onClick={closeAllMenus}>
                     <img
-                        src="/Seka-Logo.png"
+                        src="/Header-Logo.png"
                         alt="Seka Logo"
                         className="site-logo-image"
                         width="128"
