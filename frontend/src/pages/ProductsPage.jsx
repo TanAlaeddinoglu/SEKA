@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useDeferredValue} from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductFilters from "../features/public/product/components/ProductFilters";
 import ProductGrid from "../features/public/product/components/ProductGrid";
@@ -47,15 +47,13 @@ const buildParamsFromState = ({page, sort, search, categoryName}) => {
 
 export default function ProductsPage() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const initialState = parseStateFromParams(searchParams);
-    const [page, setPage] = useState(initialState.page);
-    const [size] = useState(DEFAULT_SIZE);
-    const [sort, setSort] = useState(initialState.sort);
-    const [search, setSearch] = useState(initialState.search);
-    const [debouncedSearch, setDebouncedSearch] = useState(
-        initialState.search.trim()
-    );
-    const [categoryName, setCategoryName] = useState(initialState.categoryName);
+    const currentState = parseStateFromParams(searchParams);
+    const page = currentState.page;
+    const size = DEFAULT_SIZE;
+    const sort = currentState.sort;
+    const search = currentState.search;
+    const categoryName = currentState.categoryName;
+    const deferredSearch = useDeferredValue(search.trim());
     const hasSeoFilteredState =
         page > DEFAULT_PAGE ||
         sort !== DEFAULT_SORT ||
@@ -72,36 +70,13 @@ export default function ProductsPage() {
             : undefined,
     });
 
-    useEffect(() => {
-        const handle = setTimeout(() => {
-            setDebouncedSearch(search.trim());
-        }, 300);
-        return () => clearTimeout(handle);
-    }, [search]);
-
-    useEffect(() => {
-        const fromUrl = parseStateFromParams(searchParams);
-        setPage((prev) => (prev === fromUrl.page ? prev : fromUrl.page));
-        setSort((prev) => (prev === fromUrl.sort ? prev : fromUrl.sort));
-        setSearch((prev) => (prev === fromUrl.search ? prev : fromUrl.search));
-        setCategoryName((prev) =>
-            prev === fromUrl.categoryName ? prev : fromUrl.categoryName
-        );
-    }, [searchParams]);
-
-    useEffect(() => {
-        const nextParams = buildParamsFromState({
-            page,
-            sort,
-            search: search.trim(),
-            categoryName,
-        });
-        const currentParams = new URLSearchParams(searchParams);
-        if (nextParams.toString() === currentParams.toString()) {
+    const updateSearchParams = (nextState) => {
+        const nextParams = buildParamsFromState(nextState);
+        if (nextParams.toString() === searchParams.toString()) {
             return;
         }
         setSearchParams(nextParams, {replace: true});
-    }, [page, sort, search, categoryName, searchParams, setSearchParams]);
+    };
 
     const { data: categories = [] } = usePublicCategories();
 
@@ -109,7 +84,7 @@ export default function ProductsPage() {
         page: Math.max(page - 1, 0),
         size,
         sort,
-        search: debouncedSearch || undefined,
+        search: deferredSearch || undefined,
         categoryName: categoryName || undefined,
     });
 
@@ -124,19 +99,31 @@ export default function ProductsPage() {
             <ProductFilters
                 search={search}
                 onSearchChange={(value) => {
-                    setPage(1);
-                    setSearch(value);
+                    updateSearchParams({
+                        page: DEFAULT_PAGE,
+                        sort,
+                        search: value,
+                        categoryName,
+                    });
                 }}
                 sort={sort}
                 onSortChange={(value) => {
-                    setPage(1);
-                    setSort(value);
+                    updateSearchParams({
+                        page: DEFAULT_PAGE,
+                        sort: value,
+                        search,
+                        categoryName,
+                    });
                 }}
                 categories={categories}
                 categoryId={categoryName}
                 onCategoryChange={(value) => {
-                    setPage(1);
-                    setCategoryName(value);
+                    updateSearchParams({
+                        page: DEFAULT_PAGE,
+                        sort,
+                        search,
+                        categoryName: value,
+                    });
                 }}
             />
 
@@ -151,7 +138,14 @@ export default function ProductsPage() {
             <div className="pagination">
                 <button
                     disabled={!data || page <= 1}
-                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                        updateSearchParams({
+                            page: Math.max(page - 1, DEFAULT_PAGE),
+                            sort,
+                            search,
+                            categoryName,
+                        })
+                    }
                 >
                     Önceki
                 </button>
@@ -162,7 +156,14 @@ export default function ProductsPage() {
                 </span>
                 <button
                     disabled={!data || (data.totalPages ? page >= data.totalPages : false)}
-                    onClick={() => setPage((prev) => prev + 1)}
+                    onClick={() =>
+                        updateSearchParams({
+                            page: page + 1,
+                            sort,
+                            search,
+                            categoryName,
+                        })
+                    }
                 >
                     Sonraki
                 </button>

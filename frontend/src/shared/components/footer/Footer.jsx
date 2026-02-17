@@ -21,7 +21,7 @@ export default function Footer() {
             <div className="footer-main">
                 <NavLink className="footer-logo" to="/">
                     <img
-                        src="/Seka-Logo.png"
+                        src="/Header-Logo.png"
                         alt="Seka Logo"
                         width="250"
                         height="125"

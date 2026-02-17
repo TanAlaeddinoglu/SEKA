@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import {useMemo, useState} from "react";
 
 const resolveCover = (images = []) =>
     images.find((img) => img.cover) || images[0];
+
+const resolveImageKey = (img, index) =>
+    String(img?.id ?? img?.url ?? index);
 
 export default function ProductDetailGallery({
     images = [],
@@ -15,18 +18,34 @@ export default function ProductDetailGallery({
         () => resolveCover(normalizedImages),
         [normalizedImages]
     );
-    const [activeIndex, setActiveIndex] = useState(0);
-
-    useEffect(() => {
-        if (!cover) {
-            setActiveIndex(0);
-            return;
-        }
+    const imageKeys = useMemo(
+        () => normalizedImages.map((img, index) => resolveImageKey(img, index)),
+        [normalizedImages]
+    );
+    const coverKey = useMemo(() => {
+        if (!cover || !normalizedImages.length) return imageKeys[0] || null;
         const index = normalizedImages.findIndex(
-            (img) => img.id === cover.id
+            (img) =>
+                (img.id !== undefined &&
+                    cover.id !== undefined &&
+                    img.id === cover.id) ||
+                img.url === cover.url
         );
-        setActiveIndex(index >= 0 ? index : 0);
-    }, [cover, normalizedImages]);
+        return imageKeys[index >= 0 ? index : 0] || null;
+    }, [cover, normalizedImages, imageKeys]);
+    const [activeKey, setActiveKey] = useState(() => coverKey);
+    const activeIndex = useMemo(() => {
+        if (!normalizedImages.length) return 0;
+        if (activeKey) {
+            const matchIndex = imageKeys.findIndex((key) => key === activeKey);
+            if (matchIndex >= 0) return matchIndex;
+        }
+        if (coverKey) {
+            const coverIndex = imageKeys.findIndex((key) => key === coverKey);
+            if (coverIndex >= 0) return coverIndex;
+        }
+        return 0;
+    }, [activeKey, coverKey, imageKeys, normalizedImages.length]);
 
     if (!normalizedImages.length) {
         return (
@@ -39,12 +58,14 @@ export default function ProductDetailGallery({
     const total = normalizedImages.length;
     const handlePrev = () => {
         if (total <= 1) return;
-        setActiveIndex((prev) => (prev - 1 + total) % total);
+        const nextIndex = (activeIndex - 1 + total) % total;
+        setActiveKey(imageKeys[nextIndex]);
     };
 
     const handleNext = () => {
         if (total <= 1) return;
-        setActiveIndex((prev) => (prev + 1) % total);
+        const nextIndex = (activeIndex + 1) % total;
+        setActiveKey(imageKeys[nextIndex]);
     };
     const activeImage = normalizedImages[activeIndex] || normalizedImages[0];
 
@@ -91,12 +112,12 @@ export default function ProductDetailGallery({
                 <div className="product-gallery-dots" role="tablist">
                     {normalizedImages.map((img, index) => (
                         <button
-                            key={img.id}
+                            key={imageKeys[index]}
                             type="button"
                             className={`product-gallery-dot${
                                 index === activeIndex ? " active" : ""
                             }`}
-                            onClick={() => setActiveIndex(index)}
+                            onClick={() => setActiveKey(imageKeys[index])}
                             aria-label={`Görsel ${index + 1}`}
                             aria-pressed={index === activeIndex}
                         />
