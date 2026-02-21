@@ -1,8 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import {parseApiError} from "../../../../shared/utils/errorParser";
+import {useSendContactMail} from "../hooks/useSendContactMail";
 import "../styles/ContactForm.css";
 
 const RECAPTCHA_SCRIPT_ID = "recaptcha-v2-script";
 const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+const MAX_FULL_NAME_LENGTH = 60;
+const MIN_FULL_NAME_LENGTH = 2;
+const MAX_EMAIL_LENGTH = 80;
+const MAX_PHONE_LENGTH = 14;
+const MIN_MESSAGE_LENGTH = 10;
+const MAX_MESSAGE_LENGTH = 3000;
+const PHONE_PATTERN = /^[0-9+()\-\s]*$/;
 let recaptchaLoadPromise = null;
 
 const waitForRecaptchaReady = (timeoutMs = 10000) =>
@@ -68,6 +78,7 @@ const loadRecaptchaScript = () => {
 };
 
 export default function ContactForm() {
+    const sendContactMail = useSendContactMail();
     const recaptchaRef = useRef(null);
     const recaptchaWidgetId = useRef(null);
     const [captchaToken, setCaptchaToken] = useState("");
@@ -170,9 +181,14 @@ export default function ContactForm() {
         }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         setSubmitStatus({ type: "idle", message: "" });
+
+        const fullName = formData.fullName.trim();
+        const email = formData.email.trim();
+        const phone = formData.phone.trim();
+        const message = formData.message.trim();
 
         if (!captchaToken) {
             setSubmitStatus({
@@ -182,11 +198,7 @@ export default function ContactForm() {
             return;
         }
 
-        if (
-            !formData.fullName.trim() ||
-            !formData.email.trim() ||
-            !formData.message.trim()
-        ) {
+        if (!fullName || !email || !message) {
             setSubmitStatus({
                 type: "error",
                 message: "Lütfen gerekli alanları doldurun.",
@@ -194,19 +206,85 @@ export default function ContactForm() {
             return;
         }
 
+        if (
+            fullName.length < MIN_FULL_NAME_LENGTH ||
+            fullName.length > MAX_FULL_NAME_LENGTH
+        ) {
+            setSubmitStatus({
+                type: "error",
+                message: "Ad soyad 2 ile 60 karakter arasında olmalı.",
+            });
+            return;
+        }
+
+        if (email.length > MAX_EMAIL_LENGTH) {
+            setSubmitStatus({
+                type: "error",
+                message: "E-posta en fazla 80 karakter olabilir.",
+            });
+            return;
+        }
+
+        if (phone.length > MAX_PHONE_LENGTH) {
+            setSubmitStatus({
+                type: "error",
+                message: "Telefon en fazla 14 karakter olabilir.",
+            });
+            return;
+        }
+
+        if (phone && !PHONE_PATTERN.test(phone)) {
+            setSubmitStatus({
+                type: "error",
+                message: "Telefon formatı geçersiz.",
+            });
+            return;
+        }
+
+        if (
+            message.length < MIN_MESSAGE_LENGTH ||
+            message.length > MAX_MESSAGE_LENGTH
+        ) {
+            setSubmitStatus({
+                type: "error",
+                message: "Mesaj 10 ile 3000 karakter arasında olmalı.",
+            });
+            return;
+        }
+
         setIsSubmitting(true);
-        setSubmitStatus({
-            type: "success",
-            message: "Mesajınız başarıyla gönderildi.",
-        });
-        setFormData({
-            fullName: "",
-            email: "",
-            phone: "",
-            message: "",
-        });
-        resetCaptcha();
-        setIsSubmitting(false);
+        try {
+            const response = await sendContactMail.mutateAsync({
+                fullName,
+                email,
+                phone,
+                message,
+            });
+            const successMessage =
+                response?.message || "Mesajınız başarıyla gönderildi.";
+
+            setSubmitStatus({
+                type: "success",
+                message: successMessage,
+            });
+            toast.success(successMessage);
+            setFormData({
+                fullName: "",
+                email: "",
+                phone: "",
+                message: "",
+            });
+            resetCaptcha();
+        } catch (error) {
+            const errorMessage = parseApiError(error);
+            toast.error(errorMessage);
+            setSubmitStatus({
+                type: "error",
+                message: errorMessage,
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -221,6 +299,8 @@ export default function ContactForm() {
                     placeholder="Ad Soyad"
                     value={formData.fullName}
                     onChange={handleChange}
+                    minLength={MIN_FULL_NAME_LENGTH}
+                    maxLength={MAX_FULL_NAME_LENGTH}
                     required
                 />
             </div>
@@ -234,6 +314,7 @@ export default function ContactForm() {
                     placeholder="örnek@mail.com"
                     value={formData.email}
                     onChange={handleChange}
+                    maxLength={MAX_EMAIL_LENGTH}
                     required
                 />
             </div>
@@ -247,6 +328,8 @@ export default function ContactForm() {
                     placeholder="0 5xx xxx xx xx"
                     value={formData.phone}
                     onChange={handleChange}
+                    maxLength={MAX_PHONE_LENGTH}
+                    pattern="[0-9+()\\-\\s]*"
                 />
             </div>
 
@@ -259,6 +342,8 @@ export default function ContactForm() {
                     placeholder="Mesajınızı yazın"
                     value={formData.message}
                     onChange={handleChange}
+                    minLength={MIN_MESSAGE_LENGTH}
+                    maxLength={MAX_MESSAGE_LENGTH}
                     required
                 />
             </div>

@@ -23,7 +23,10 @@ httpClient.interceptors.response.use(
     (response) => response,
     (error) => {
         const message = parseApiError(error);
-        toast.error(message);
+        const shouldShowToast = error?.config?.showErrorToast !== false;
+        if (shouldShowToast) {
+            toast.error(message);
+        }
         return Promise.reject(error);
     }
 );

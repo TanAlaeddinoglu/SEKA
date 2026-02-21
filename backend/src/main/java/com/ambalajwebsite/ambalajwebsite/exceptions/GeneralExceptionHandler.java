@@ -104,4 +104,37 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    @ExceptionHandler(MailDeliveryException.class)
+    public ResponseEntity<Map<String, Object>> handleMailDeliveryException(
+            MailDeliveryException ex,
+            HttpServletRequest request
+    ) {
+        Map<String, Object> body = Map.of(
+                "timestamp", new Date(),
+                "status", HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "error", "MAIL_DELIVERY_FAILED",
+                "message", ex.getMessage(),
+                "path", request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleRateLimitExceededException(
+            RateLimitExceededException ex,
+            HttpServletRequest request
+    ) {
+        Map<String, Object> body = Map.of(
+                "timestamp", new Date(),
+                "status", HttpStatus.TOO_MANY_REQUESTS.value(),
+                "error", "TOO_MANY_REQUESTS",
+                "message", ex.getMessage(),
+                "path", request.getRequestURI()
+        );
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
+                .body(body);
+    }
+
 }
