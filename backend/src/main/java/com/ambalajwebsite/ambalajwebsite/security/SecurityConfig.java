@@ -60,6 +60,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/v1/auth/generateToken").permitAll()
                         .requestMatchers("/v1/auth/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/v1/mail/contact").permitAll()
 
                         .requestMatchers(HttpMethod.GET,
                                 "/v1/category/**",
