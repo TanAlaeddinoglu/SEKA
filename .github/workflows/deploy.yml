@@ -178,6 +178,17 @@ jobs:
           JWT_KEY=Zj7bSZVwUZGQ11GOEpVbo0q3SecgHprPV2mI6NfEO/xnCsXzwkxLNv7XwTQGm60ZB0lRWpPwLcachGEEi3NZfQ==
           APP_CORS_ALLOWED_ORIGINS=https://sekaticaret.test
           APP_BOOTSTRAP_ADMIN_ENABLED=false
+          SPRING_MAIL_HOST=smtp.example.com
+          SPRING_MAIL_PORT=587
+          SPRING_MAIL_USERNAME=ci-mail-user
+          SPRING_MAIL_PASSWORD=ci-mail-password
+          SPRING_MAIL_SMTP_AUTH=true
+          SPRING_MAIL_SMTP_STARTTLS_ENABLE=true
+          SPRING_MAIL_SMTP_CONNECTION_TIMEOUT=5000
+          SPRING_MAIL_SMTP_TIMEOUT=5000
+          SPRING_MAIL_SMTP_WRITE_TIMEOUT=5000
+          APP_MAIL_FROM=no-reply@example.com
+          APP_MAIL_CONTACT_SUBJECT_PREFIX=[CI Contact]
           SPRING_JPA_HIBERNATE_DDL_AUTO=update
           EOF
 
