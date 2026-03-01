@@ -71,6 +71,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v1/category/**",
                                 "/v1/products/**",
+                                "/v1/product/**",
                                 "/v1/product-feature/**"
                         ).hasRole("ADMIN")
 
